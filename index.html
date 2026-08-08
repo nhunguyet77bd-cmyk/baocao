@@ -2,683 +2,767 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>週報 Báo Cáo Tuần TikTok – LOHO HOUSE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>週報 Báo Cáo TikTok – LOHO HOUSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
-
-:root{
-  --bg:#FAF7F2; --surface:#FFFFFF; --surface2:#F5EFE6; --border:#E8DECE;
-  --brown:#3D2B1F; --brown2:#6B4C35; --accent:#C4956A; --accent2:#E8C4A0;
-  --green:#5C8A6B; --red:#C0614B; --amber:#B7791F; --gray:#B8AC9E;
-  --text:#2C1F14; --text2:#7A6555; --text3:#B09A86;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Be Vietnam Pro','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
-/* ═══ HEADER ═══ */
-.header{background:linear-gradient(135deg,#2E2013 0%,#3D2B1F 45%,#6B4C35 100%);
-  padding:34px 24px 28px;text-align:center;color:#FAF7F2}
-.header h1{font-size:26px;font-weight:700;letter-spacing:-.3px}
-.header h1 .gold{color:#D4B896}
-.header .sub{font-size:13px;color:#D4B896;margin-top:6px}
-.header .sub b{color:#FFF6EA}
-
-/* ═══ BỘ LỌC THÁNG → TUẦN ═══ */
-.filterbar{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 16px 16px;text-align:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(61,43,31,.05)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.chips + .chips{margin-top:10px}
-.chip{border:1px solid var(--border);background:var(--surface);color:var(--text2);
-  border-radius:24px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;
-  font-family:inherit;transition:.15s}
+:root{--bg:#F7F1E8;--surface:#FFFFFF;--border:#E8DCCB;--brown:#6B4A2F;--brown2:#3D2B1F;--accent:#C89B6C;
+--text:#3D2B1F;--text2:#8A7460;--good:#2E7D46;--goodbg:#E4F2E7;--bad:#B3432B;--badbg:#FAE8E2;--gold:#B8860B;--goldbg:#FBF3DC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.small{font-size:11.5px;color:var(--text2)}
+.zh{color:var(--accent);font-weight:700;margin-right:6px}
+header{background:linear-gradient(120deg,#2E1F14,#6B4A2F 70%,#8a6a45);color:#FFF6EA;padding:26px 16px;text-align:center}
+header h1{font-size:24px;font-weight:800}
+header h1 .gold{color:#E8C79B}
+#hsub{margin-top:8px;font-size:13px;color:#E7D7C3}
+#hsub b{color:#fff}
+/* ── bộ lọc ── */
+.filterbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 10px;text-align:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(61,43,31,.05)}
+.mrow{display:flex;flex-wrap:nowrap;gap:6px;justify-content:center;overflow-x:auto;padding-bottom:4px}
+.chip{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:20px;padding:7px 13px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex:0 0 auto}
 .chip:hover:not(:disabled){border-color:var(--accent);color:var(--brown)}
 .chip.on{background:var(--brown2);border-color:var(--brown2);color:#FFF6EA}
-.chip.on.wk{background:var(--accent);border-color:var(--accent);color:#3D2B1F}
 .chip:disabled{opacity:.35;cursor:not-allowed}
-.chip.wk{font-size:12px;padding:6px 14px}
-.filternote{font-size:11px;color:var(--text3);margin-top:10px}
-
-/* ═══ TOOLBAR ═══ */
-.toolbar{max-width:1100px;margin:14px auto 0;padding:0 24px;display:flex;gap:8px;justify-content:flex-end}
-.tbtn{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:8px;
-  padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.tbtn:hover{border-color:var(--accent);color:var(--brown)}
-.tbtn.active{background:var(--amber);border-color:var(--amber);color:#fff}
-
-.container{max-width:1100px;margin:0 auto;padding:10px 24px 64px}
-
-/* ═══ BANNER ═══ */
-.banner{background:#FFF4E0;border:1px solid #EAD199;border-radius:12px;padding:12px 18px;
-  font-size:13px;color:#8A6516;margin:16px 0 4px}
-.banner.edited{background:#FDECE7;border-color:#EBC2B5;color:#93412D}
-.banner button{margin-left:10px;border:1px solid currentColor;background:transparent;color:inherit;
-  border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;font-family:inherit}
-
-/* ═══ SECTION ═══ */
-.sec{display:flex;align-items:baseline;gap:10px;margin:38px 0 6px;border-bottom:2px solid var(--accent);padding-bottom:8px}
-.sec .num{font-size:20px;color:var(--brown2);font-weight:700}
-.sec h2{font-size:19px;font-weight:700;color:var(--brown)}
-.sec h2 .zh{color:var(--brown2);margin-right:6px;font-weight:600}
-.sec .star{font-size:13px;color:var(--amber)}
-.secnote{font-size:12px;color:var(--text3);margin:2px 0 14px}
-
-.empty{color:var(--text3);font-size:13px;font-style:italic;padding:14px 4px}
-
-/* ═══ KPI ═══ */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:14px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
-.kpi .lb{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
-.kpi .lb .zh{color:var(--accent)}
-.kpi .val{font-size:25px;font-weight:700;color:var(--brown);margin:6px 0 4px;line-height:1.1}
-.kpi .val span{font-size:13px;font-weight:500;color:var(--text2)}
-.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.badge.up{background:#EBF5EE;color:var(--green)}
-.badge.down{background:#FAEAE7;color:var(--red)}
-.badge.neu{background:var(--surface2);color:var(--text2)}
-
-/* ═══ TABLE ═══ */
-.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-top:12px}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
-th{background:var(--surface2);color:var(--brown2);font-size:11px;text-transform:uppercase;
-  letter-spacing:.5px;font-weight:700;padding:11px 14px;text-align:left;white-space:nowrap}
-td{padding:11px 14px;border-top:1px solid var(--border);vertical-align:top}
+/* lịch tháng */
+.calwrap{max-width:300px;margin:10px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 9px}
+.calhead{display:grid;grid-template-columns:26px repeat(7,1fr);gap:2px;font-size:9px;color:var(--text2);font-weight:700;margin-bottom:3px}
+.calrow{display:grid;grid-template-columns:26px repeat(7,1fr);gap:2px;margin-bottom:2px}
+.wkbtn{border:1px solid var(--border);background:#FBF6EE;border-radius:6px;font-size:8.5px;font-weight:700;color:var(--brown);cursor:pointer;font-family:inherit}
+.wkbtn:hover{background:var(--accent);color:#fff}
+.day{border:1px solid transparent;border-radius:6px;padding:3px 0;font-size:10.5px;cursor:pointer;position:relative;background:transparent;font-family:inherit;color:var(--text)}
+.day:hover{border-color:var(--accent)}
+.day.out{color:#CBBBA6;pointer-events:none}
+.day.dot::after{content:'';position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.day.inr{background:#F3E4CF}
+.day.edge{background:var(--brown2);color:#FFF6EA;font-weight:700}
+.calfoot{display:flex;gap:5px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.calfoot .chip{font-size:10px;padding:4px 10px}
+#rangeLabel{margin-top:10px;font-size:13px}
+#rangeLabel b{color:var(--brown)}
+.hint{font-size:10.5px;color:var(--text2);margin-top:5px}
+/* nav 3 mục — tab ngang gọn, nằm trong thanh dính nên lướt xuống vẫn thấy */
+.nav{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;overflow-x:auto;margin:10px auto 0;max-width:960px;padding:0 12px}
+.nb{flex:0 0 auto;border:1.5px solid var(--border);background:var(--surface);border-radius:22px;padding:8px 16px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nb .ic{font-size:14px}
+.nb .t{font-weight:700;font-size:12.5px;color:var(--brown)}
+.nb.on{background:var(--brown2);border-color:var(--brown2)}
+.nb.on .t{color:#FFF6EA}
+/* nội dung */
+main{max-width:960px;margin:0 auto;padding:18px 14px 60px}
+.toolbar{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px}
+.toolbar button{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:7px 14px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--brown);cursor:pointer}
+.toolbar button.active{background:var(--goldbg);border-color:var(--gold)}
+.banner{background:#FFF4D8;border:1px solid #E8C79B;border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:14px}
+.banner button{margin-left:10px;border:1px solid var(--gold);background:#fff;border-radius:8px;padding:4px 10px;font-family:inherit;font-size:12px;cursor:pointer}
+.sec{display:flex;align-items:center;gap:10px;margin:26px 0 4px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+.sec h2{font-size:17px;font-weight:800}
+.sec .star{font-size:10.5px;background:var(--goldbg);color:var(--gold);border-radius:12px;padding:3px 10px;font-weight:700;white-space:nowrap}
+.secnote{font-size:11.5px;color:var(--text2);margin:6px 0 10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+.kpi .lb{font-size:11px;color:var(--text2);font-weight:600}
+.kpi .val{font-size:21px;font-weight:800;color:var(--brown);margin-top:4px}
+.kpi .val span{font-size:12px;font-weight:600;color:var(--text2)}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;border-radius:10px;padding:2px 8px;margin-top:6px}
+.badge.up{background:var(--goodbg);color:var(--good)}
+.badge.dn{background:var(--badbg);color:var(--bad)}
+.badge.fl{background:#F1EAE0;color:var(--text2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+.card h4{font-size:12px;color:var(--text2);font-weight:700;margin-bottom:8px}
+/* donut */
+.donutrow{display:flex;align-items:center;gap:16px}
+.donut{width:110px;height:110px;border-radius:50%;flex:0 0 auto;position:relative}
+.donut::after{content:'';position:absolute;inset:22px;background:var(--surface);border-radius:50%}
+.leg{font-size:12.5px}
+.leg .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.leg div{margin-bottom:6px}
+/* bar chart */
+.chart{display:flex;align-items:flex-end;gap:3px;height:150px;margin-top:24px}
+.bar{flex:1;background:linear-gradient(180deg,var(--accent),#a97e50);border-radius:4px 4px 0 0;position:relative;min-width:6px}
+.bar .v{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--brown);white-space:nowrap;margin-bottom:2px}
+.bar:hover{opacity:.8}
+.bar .tip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--brown2);color:#fff;font-size:10px;border-radius:6px;padding:3px 7px;white-space:nowrap;margin-bottom:4px;z-index:5}
+.bar:hover .tip{display:block}
+.xlabs{display:flex;gap:3px;margin-top:4px}
+.xlabs span{flex:1;font-size:8.5px;color:var(--text2);text-align:center;min-width:6px;overflow:hidden}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:#FBF6EE;color:var(--text2);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:9px 10px;text-align:left;white-space:nowrap}
+td{padding:9px 10px;border-top:1px solid #F3EBDE;vertical-align:top}
 td.r,th.r{text-align:right}
 td.c,th.c{text-align:center}
-tr:hover td{background:#FBF8F3}
-.vidname{font-weight:600;color:var(--brown);max-width:340px}
-.small{font-size:12px;color:var(--text2)}
-.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 10px;border-radius:12px;background:var(--surface2);color:var(--brown2);white-space:nowrap}
-.tag.ads{background:#FAEAE7;color:var(--red)}
-.tag.org{background:#EBF5EE;color:var(--green)}
-.tag.gold{background:#F7EDD8;color:var(--amber)}
-
-/* trạng thái clip */
-.st{display:inline-block;font-size:12px;font-weight:600;padding:3px 12px;border-radius:14px;white-space:nowrap}
-.st.dadang{background:#EBF5EE;color:var(--green)}
-.st.choedit{background:#FFF4E0;color:var(--amber)}
-.st.chuaquay{background:#F0EBFA;color:#6B5A9E}
-.st.ytuong{background:var(--surface2);color:var(--text2)}
-.st.boqua{background:#FAEAE7;color:var(--red)}
-
-/* thanh % trong bảng */
-.bar{height:7px;border-radius:5px;background:var(--surface2);margin-top:5px;min-width:90px}
-.bar i{display:block;height:100%;border-radius:5px;background:var(--accent)}
-
-/* ═══ DONUT ads/organic ═══ */
-.split{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:12px;align-items:start}
-@media(max-width:760px){.split{grid-template-columns:1fr}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
-.donutwrap{text-align:center}
-.donut{width:170px;height:170px;border-radius:50%;margin:8px auto;position:relative}
-.donut::after{content:'';position:absolute;inset:34px;background:var(--surface);border-radius:50%}
-.donut .mid{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:2}
-.donut .mid b{font-size:20px;color:var(--brown)}
-.donut .mid span{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
-.leg{display:flex;flex-direction:column;gap:8px;margin-top:12px;text-align:left}
-.leg .row{display:flex;align-items:center;gap:8px;font-size:13px}
-.leg .dot{width:11px;height:11px;border-radius:3px;flex:none}
-.leg b{margin-left:auto}
-
-/* ═══ TOP CARDS ═══ */
-.tops{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-@media(max-width:760px){.tops{grid-template-columns:1fr}}
-.topcard{background:linear-gradient(135deg,#FFFDF9,#F7F0E4);border:1px solid var(--accent2);border-radius:14px;padding:18px 20px}
-.topcard .lb{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px}
-.topcard .name{font-size:15px;font-weight:700;color:var(--brown);margin:6px 0 2px}
-.topcard .num{font-size:22px;font-weight:700;color:var(--brown2)}
-.topcard .num span{font-size:13px;font-weight:500;color:var(--text2)}
-
-/* ═══ NHẬN XÉT / KẾ HOẠCH ═══ */
-.bullets{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px 20px;margin-top:12px}
-.bullets .b{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--surface2);font-size:13.5px}
-.bullets .b:last-child{border-bottom:0}
-.bullets .ic{flex:none}
-
-/* ═══ DỰ ÁN RIÊNG ═══ */
-.projbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:12px}
-.projbox select{font-family:inherit;font-size:14px;font-weight:600;color:var(--brown);
-  border:1px solid var(--border);border-radius:10px;padding:9px 14px;background:var(--surface2);min-width:260px;max-width:100%}
-.projgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-@media(max-width:760px){.projgrid{grid-template-columns:1fr}}
-.projcell{background:var(--surface2);border-radius:12px;padding:14px 16px}
-.projcell h4{font-size:12px;color:var(--brown2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.projcell ul{list-style:none}
-.projcell li{font-size:13px;padding:3px 0 3px 2px}
+.vidname{font-weight:600;max-width:280px}
+.tag{display:inline-block;font-size:10px;font-weight:700;border-radius:9px;padding:2px 8px}
+.tag.ads{background:var(--badbg);color:var(--bad)}
+.tag.org{background:var(--goodbg);color:var(--good)}
+.tag.gold{background:var(--goldbg);color:var(--gold)}
+.st{display:inline-block;font-size:10.5px;font-weight:700;border-radius:9px;padding:3px 9px;white-space:nowrap}
+.st.dadang{background:var(--goodbg);color:var(--good)}
+.st.choedit{background:var(--goldbg);color:var(--gold)}
+.st.chuaquay{background:#EEE7FB;color:#5B44A8}
+.st.ytuong{background:#F1EAE0;color:var(--text2)}
+tr.hl1 td{background:#F3E4CF}   /* nền be = kỳ đang xem */
+tr.hl2 td{background:#FFF1BF}   /* nền vàng = tuần kế tiếp */
+.pipestats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0 4px}
+.pipestat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.pipestat b{font-size:21px;color:var(--brown);display:block}
+.pipestat span{font-size:10.5px;color:var(--text2)}
+.bullets .b{display:flex;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:8px}
+.bullets .ic{flex:0 0 auto}
+.empty{background:#FBF6EE;border:1px dashed var(--border);border-radius:12px;padding:14px;text-align:center;font-size:12.5px;color:var(--text2);margin:10px 0}
+/* dự án */
+.projbox select{width:100%;max-width:420px;font-family:inherit;font-size:14px;font-weight:600;color:var(--brown);padding:11px 14px;border:1.5px solid var(--accent);border-radius:12px;background:var(--surface);margin:10px 0}
+.projgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.projgrid{grid-template-columns:1fr}}
+.projcell{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px}
 .projcell.full{grid-column:1/-1}
-.progressbig{height:12px;border-radius:8px;background:#E8DECE;overflow:hidden;margin-top:6px}
-.progressbig i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--brown2))}
-
-/* ═══ TIẾN ĐỘ SX summary ═══ */
-.pipestats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0 4px}
-.pipestat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center}
-.pipestat b{font-size:22px;color:var(--brown);display:block}
-.pipestat span{font-size:11px;color:var(--text2)}
-
-.footer{text-align:center;font-size:11px;color:var(--text3);padding:30px 0 14px}
-
-/* ═══ SETUP SCREEN ═══ */
-.state{max-width:620px;margin:60px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px}
-.state h2{color:var(--brown);margin-bottom:12px}
-.state ol{margin:10px 0 10px 20px}
-.state li{margin:6px 0}
-.state input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:13px;margin:10px 0}
-.state button{background:var(--brown2);color:#fff;border:0;border-radius:8px;padding:10px 20px;font-family:inherit;font-weight:600;cursor:pointer}
-
-/* ═══ IN ẤN ═══ */
+.projcell h4{font-size:11.5px;color:var(--text2);margin-bottom:7px}
+.projcell ul{list-style:none}
+.projcell li{font-size:12.5px;padding:4px 0}
+.progressbig{height:10px;background:#F1EAE0;border-radius:6px;margin-top:8px;overflow:hidden}
+.progressbig i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:6px}
+/* 2 team cạnh nhau để so sánh */
+.teamwrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;align-items:start}
+@media(max-width:640px){.teamwrap{grid-template-columns:1fr}}
+.teamcard{background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(107,74,47,.08)}
+.tname{font-size:17px;font-weight:800;text-align:center;color:var(--brown);background:#FBF6EE;border:1px solid var(--accent);border-radius:10px;padding:9px;margin-bottom:12px}
+.trow.em{background:var(--goldbg);border-radius:10px;padding:9px 10px;border-top:none;margin-top:8px}
+.trow.em .tl{color:var(--gold)}
+.trow.em li{font-weight:700}
+.tick{color:var(--good);font-weight:800}
+.tick.off{color:#C9BBA8;font-weight:600}
+.trow{padding:8px 0;border-top:1px dashed var(--border);font-size:12.5px}
+.trow:first-of-type{border-top:none}
+.trow .no{display:inline-block;min-width:20px;font-weight:800;color:var(--accent)}
+.trow .tl{font-weight:700;color:var(--text2);font-size:11px}
+.trow ul{list-style:none;margin-top:3px}
+.trow li{padding:2px 0 2px 22px}
+.timeline{margin-top:14px}
+.tl-day{display:flex;gap:12px;margin-bottom:10px}
+.tl-date{flex:0 0 86px;font-size:11.5px;font-weight:700;color:var(--brown);padding-top:11px;text-align:right}
+.tl-body{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 13px;font-size:12.5px}
+.tl-body div{padding:2px 0}
+footer{text-align:center;padding:24px;font-size:11px;color:var(--text2)}
 @media print{
-  .filterbar,.toolbar,.banner button{display:none!important}
-  .header{padding:20px}
-  body{font-size:12px}
-  .sec{break-after:avoid}
-  .tblwrap,.card,.bullets,.projbox{break-inside:avoid}
+  .filterbar,.toolbar,.nav,.banner button,.hint{display:none!important}
+  body{background:#fff}
+  header{background:#3D2B1F!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  main{max-width:none}
 }
-[contenteditable="true"]{outline:1px dashed var(--amber);outline-offset:2px}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <h1><span class="gold">LOHO</span> House <span class="gold">TikTok 內容週報</span> Báo Cáo Tuần TikTok</h1>
-  <div class="sub" id="hsub">Đang tải dữ liệu…</div>
-</div>
+<header>
+  <h1>LOHO <span class="gold">House TikTok</span> 內容週報 Báo Cáo TikTok</h1>
+  <div id="hsub">Đang tải dữ liệu…</div>
+</header>
 
 <div class="filterbar" id="filterbar" style="display:none">
-  <div class="chips" id="monthChips"></div>
-  <div class="chips" id="weekChips"></div>
-  <div class="filternote">Chọn <b>tháng</b> rồi chọn <b>tuần</b> — tuần chưa có số liệu sẽ bị mờ</div>
+  <div class="mrow" id="monthChips"></div>
+  <div class="calwrap" id="calBox"></div>
+  <div id="rangeLabel"></div>
+  <div class="nav" id="navTabs" style="display:none"></div>
 </div>
 
-<div class="toolbar" id="toolbar" style="display:none">
-  <button class="tbtn" id="editBtn" onclick="toggleEdit()">✏️ Sửa trang</button>
-  <button class="tbtn" onclick="window.print()">🖨️ In / Xuất PDF</button>
-</div>
-
-<div class="container"><div id="app"><div class="empty" style="text-align:center;padding:60px 0">⏳ Đang tải…</div></div></div>
-<div class="footer">LOHO House · Báo cáo TikTok Content · trang tự đọc số liệu từ Google Sheet</div>
+<main>
+  <div class="toolbar" id="toolbar" style="display:none">
+    <button id="editBtn" onclick="toggleEdit()">Sửa trang</button>
+    <button onclick="resetEdit()" title="Bỏ bản sửa tay của khoảng ngày này">Về số liệu gốc</button>
+    <button onclick="window.print()">In / Xuất PDF</button>
+  </div>
+  <div id="app"><div class="empty">Đang tải…</div></div>
+</main>
+<footer>LOHO House · Báo cáo TikTok Content · trang tự đọc số liệu từ Google Sheet (4 tab) + lịch content</footer>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   BÁO CÁO TUẦN TIKTOK — LOHO HOUSE (bản mới 04/08/2026)
-   Cấu trúc sheet: cột A = LOẠI dòng · cột B = MÃ TUẦN (2026-08-1) · cột C trở đi = dữ liệu
-   Các loại dòng: META KPI GMVVIDEO VIDEO CLIP QUAYSAU SANPHAM NHANXET KEHOACH TREND DUAN
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════ CẤU HÌNH ═══════════ */
 const SHEET_ID = '1CHDLJAjR9UaQ5wPjkF9ZBMwGTU2ifuM_GT0LXGUkypM';
-/* Sheet LỊCH CONTENT theo ngày (file quản lý content 10 tab) — trang tự đọc, lọc theo tuần đang xem */
+/* gid 4 tab — đã liên kết 07/08/2026 sau khi user nạp file Excel */
+const GIDS = { TONGQUAN:'478377195', VIDEO:'38848415', DUAN:'1337926435', NHANXET:'28714051' };
+/* Lịch content theo ngày — tab LỊCH ĐĂNG file quản lý content */
 const CONTENT_CSV_URL = 'https://docs.google.com/spreadsheets/d/1ASAWCqucmXOIBI-DjgXTdDiONOHEhOF1yG5hMKH0uxs/export?format=csv&gid=1170970805';
+/* PHẢI dùng /export?format=csv — KHÔNG dùng /gviz/tq (nó xoá chữ trong cột lẫn số). */
+const tabUrl = g => 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid='+g;
 
-function sheetUrls(){
-  const saved = localStorage.getItem('loho_csv_url');
-  const fromQuery = new URLSearchParams(location.search).get('csv');
-  const list = [];
-  if (fromQuery) list.push(fromQuery);
-  if (saved) list.push(saved);
-  // PHẢI dùng /export?format=csv — KHÔNG dùng /gviz/tq (nó xoá chữ trong cột lẫn số).
-  list.push('https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv');
-  return list;
-}
+/* ═══════════ TIỆN ÍCH ═══════════ */
+const cl = s => (s==null?'':String(s)).trim();
+const esc = s => cl(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const num = s => { const n=parseFloat(cl(s).replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; };
+const fmtN = n => n===''||n==null||isNaN(n) ? '—' : Number(n).toLocaleString('vi-VN');
+const fmtMoney = n => { n=Number(n)||0; if(n>=1e9) return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ'; if(n>=1e6) return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+'tr'; return n?Math.round(n).toLocaleString('vi-VN')+'đ':'—'; };
+function dmy(s){ const m=cl(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(!m) return null; return new Date(+m[3],+m[2]-1,+m[1]); }
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const ddmm = d => String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+const addD = (d,n) => new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const sameD = (a,b) => a&&b&&a.getTime()===b.getTime();
 
-/* ── CSV parser (xử lý nháy kép + xuống dòng trong ô) ── */
 function parseCSV(text){
-  const rows=[]; let row=[], cell='', q=false;
+  const rows=[]; let row=[],cell='',q=false;
   for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
-    else { if(c==='"') q=true;
-      else if(c===','){ row.push(cell); cell=''; }
-      else if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
-      else if(c!=='\r') cell+=c; }
+    const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"') q=true;
+    else if(ch===','){ row.push(cell); cell=''; }
+    else if(ch==='\n'){ row.push(cell.replace(/\r$/,'')); rows.push(row); row=[]; cell=''; }
+    else cell+=ch;
   }
-  if(cell!=='' || row.length){ row.push(cell); rows.push(row); }
+  if(cell!==''||row.length){ row.push(cell.replace(/\r$/,'')); rows.push(row); }
   return rows;
 }
 
-/* ── tiện ích ── */
-const esc = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const cl  = s => String(s??'').trim();
-const num = v => { const n=parseFloat(String(v??'').trim().replace(/\./g,'').replace(',','.')); return isNaN(n)?0:n; };
-const fmtN = v => { const s=cl(v); return /^-?\d+$/.test(s) ? Number(s).toLocaleString('vi-VN') : s; };
-const fmtMoney = v => { const n=num(v);
-  if(n>=1e9)  return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ';
-  if(n>=1e6)  return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+'tr';
-  if(n>=1e3)  return n.toLocaleString('vi-VN')+'đ';
-  return n?n.toLocaleString('vi-VN')+'đ':'0đ'; };
-const pctBadge = (cur,prev) => {
-  if(prev===null||prev===undefined||!isFinite(prev)||prev===0) return '<span class="badge neu">— tuần đầu có số</span>';
-  const p=(cur-prev)/Math.abs(prev)*100, s=p.toLocaleString('vi-VN',{maximumFractionDigits:1});
-  if(p>0.05)  return '<span class="badge up">▲ +'+s+'%</span>';
-  if(p<-0.05) return '<span class="badge down">▼ '+s+'%</span>';
-  return '<span class="badge neu">— không đổi</span>'; };
+/* ═══════════ TRẠNG THÁI ═══════════ */
+const DB = { tq:[], vid:[], duan:[], nx:[] };
+let CONTENT=null, CONTENT_ERR=false;
+let DEMOTABS=[];             // tab đang dùng số liệu mẫu
+let RA=null, RB=null;        // khoảng ngày đang xem
+let CURMONTH=null, CURYEAR=null;
+let calOpen=false;           // lịch tháng chỉ bung khi bấm chip tháng
+let SEC='s1';                // mục đang mở
+let pickStart=null;          // đang chọn ngày đầu của range tuỳ chỉnh
+let editing=false, saveTimer=null;
+window.__projKeep=null;
 
-const CLIP_ST = {DADANG:['dadang','✅ Đã đăng'],CHOEDIT:['choedit','🎬 Quay rồi – chờ edit'],
-  CHUAQUAY:['chuaquay','📝 Có kịch bản – chưa quay'],YTUONG:['ytuong','💡 Mới có ý tưởng']};
-const TREND_ST = {DAQUAY:['dadang','✅ Đã quay theo'],KICHBAN:['choedit','📝 Đang lên kịch bản'],BOQUA:['boqua','❌ Bỏ qua']};
+/* ═══════════ SỐ LIỆU MẪU (tuần thật 27/07–02/08/2026) ═══════════ */
+const DEMO = {
+tq:`NGAY,GMV_VIDEO,GMV_ADS,CHI_PHI_ADS,DON_HANG,LUOT_XEM,FOLLOWER_TANG,GHI_CHU
+27/07/2026,17800000,,,,,,
+28/07/2026,11600000,,,,,,
+29/07/2026,16900000,,,,,,
+30/07/2026,13100000,,,,,,
+31/07/2026,10400000,,,,,,
+01/08/2026,15600000,,,,,,
+02/08/2026,11400000,4100000,,554,71700,88,Tổng cả tuần điền ngày cuối tuần`,
+vid:`NGAY,TEN_VIDEO,NGAY_DANG,LOAI,NGUON,GMV,SO_DON,LUOT_XEM,TIM,BINH_LUAN,CHIA_SE,LUU,DANH_GIA
+02/08/2026,3 điều nhân viên hãng sơn không bao giờ nói với bạn,27/07/2026,Hướng dẫn,ORG,,,1611,24,1,,,Tốt — dẫn đầu tuần với 38% tổng view video mới
+02/08/2026,Băng keo nilong,29/07/2026,Sản phẩm,ORG,,,793,7,,,,Thường — view ổn nhưng tương tác thấp
+02/08/2026,Top 5 màu bán chạy nhất nhà LOHO,30/07/2026,Sản phẩm,ORG,,,668,5,,,,Thường
+02/08/2026,Cái góc này xấu nhất công ty,31/07/2026,Sản phẩm,ORG,,,669,6,,,,Thường — hook chưa đủ mạnh
+02/08/2026,Một ngày làm việc tại Loho House,02/08/2026,Đời sống,ORG,,,460,8,,,,Yếu view nhưng like tốt
+02/08/2026,Series Cải tạo phòng họp | Tập 7,,Series,ORG,5000000,,,,,,,Video cũ 3 tháng vẫn kéo tiền tốt nhất kênh
+02/08/2026,Sơn tường Loho House - Chất có mịn không,,Bán hàng,ORG,4000000,,,,,,,Ổn định nhiều tuần liền
+02/08/2026,Tính m² sàn - nhiều người vẫn nhầm,,Hướng dẫn,ADS,2800000,,,,,,,Có chạy quảng cáo — cần xem lại hiệu quả
+02/08/2026,Màu sơn nội thất bán chạy nhất LOHO,,Bán hàng,ORG,2300000,,,,,,,
+02/08/2026,Màng nilong chắn sơn chắn bụi,,Bán hàng,ORG,2280000,,,,,,,Video trả lời comment — chuyển đổi tốt
+02/08/2026,Tự cải tạo phòng dễ lắm để LoHo chỉ cho,,Bán hàng,ORG,2200000,,,,,,,
+02/08/2026,Biến sàn gạch trơn thành bám chân 10 phút,,Bán hàng,ADS,1300000,,,,,,,GMV thấp so với tiền ads — cân nhắc tắt`,
+duan:`NGAY,DU_AN,MUC,GENZ,THANHBINH,CHUNG
+02/08/2026,Bệnh nghề nghiệp,TIENDO,Hoàn thành 0/5 video,Hoàn thành 0/5 video,
+02/08/2026,Bệnh nghề nghiệp,KICHBAN,Đã gửi 5 kịch bản,Đã gửi 5 kịch bản — đang sửa theo góp ý,
+02/08/2026,Bệnh nghề nghiệp,DIENVIEN,Team đã nhận kịch bản — chờ xác nhận lịch,,
+02/08/2026,Bệnh nghề nghiệp,HOANCHINH,Chưa có — quay ngày 07/08,Chưa có — chưa xếp lịch quay,
+02/08/2026,Bệnh nghề nghiệp,BUOCTIEP,Quay ngày 07/08 — chốt file bối cảnh trước sáng 06/08,,
+02/08/2026,Bệnh nghề nghiệp,NHANXET,Phối hợp nhanh — xác nhận kịch bản trong ngày,Phản hồi chậm — cần nhắc lịch sớm hơn,
+02/08/2026,Bệnh nghề nghiệp,KEHOACH,Gửi thêm 3 kịch bản mới · nhận file quay 07/08 để chuyển edit,Chốt lịch quay trong tuần · nhận lại 5 kịch bản đã sửa,
+02/08/2026,Bệnh nghề nghiệp,GHICHU,,Đang chờ chốt slogan,
+02/08/2026,Bệnh nghề nghiệp,KHOKHAN,,,Đạo cụ công ty hỗ trợ phải thu hồi sau quay — lên danh sách mượn/trả trước buổi quay`,
+nx:`NGAY,LOAI,NOI_DUNG,GHI_CHU,SO_MON,GMV
+02/08/2026,TOT,Chất lượng video mới tăng gần gấp đôi — like trung bình nhảy từ 5.5 lên 10 mỗi video,,,
+02/08/2026,TOT,FYP đạt 37.8% vượt mục tiêu 35% — kênh bớt phụ thuộc tìm kiếm,,,
+02/08/2026,CHUA,Không video mới nào lọt bảng doanh thu — GMV vẫn dựa vào kho content cũ,,,
+02/08/2026,CHUA,Lượt chia sẻ giảm 30% và xem hồ sơ giảm 20.9% — chưa giữ chân người xem,,,
+02/08/2026,KEHOACH,Clip trend «tone đất ấm» phối màu sơn LOHO (ngoài lịch — chờ sếp duyệt ý tưởng),dự kiến cuối tuần sau,,
+02/08/2026,TREND,«Moody Earth Tones — tone đất ấm» (xu hướng nội thất 2026 thay minimalism lạnh),Đề xuất: series phối màu sơn tone đất cho từng phòng — bảng màu LOHO có sẵn,,
+02/08/2026,TREND,Content cho người mới có nhà lần đầu (ngách đang tăng mạnh),Đề xuất: «những điều không ai nói khi tự sơn nhà lần đầu» — hợp format Hướng dẫn của kênh,,
+02/08/2026,TREND,«Colorful kitchen — bếp có màu» (bếp là phòng hot 2026),Đề xuất: biến hoá bếp bằng sơn + sàn dán · quay before/after,,
+02/08/2026,TREND,[HÀI] Câu nói «Tôi tưởng ai cũng có chứ ta»,Đề xuất skit: khách khoe sàn LOHO «tôi tưởng nhà ai cũng có chứ ta» — dễ lồng bán hàng · hợp Thảo/Thúy,,
+02/08/2026,TREND,[HÀI] Câu «Ai sợ thì đi về» (MCK),Đề xuất skit: khách sợ tự sơn hỏng — «ai sợ thì đi về · ở lại LOHO chỉ cho» · hợp format hài công sở,,
+02/08/2026,TREND,[HÀI] «Hên lắm mới xui được như vậy»,Đề xuất: tình huống sơn nhầm màu/lỗi thi công rồi chữa cháy bằng sản phẩm LOHO,,
+02/08/2026,SANPHAM,COMBO 5m² (36 tấm) Sàn Nhựa Giả Gỗ Dán Keo,,225,114500000
+02/08/2026,SANPHAM,Băng keo nilon chắn sơn chắn bụi,,461,15500000
+02/08/2026,SANPHAM,Sơn tường tone màu be,,150,14400000
+02/08/2026,SANPHAM,Sơn tường tone trắng xám (số mẫu — sửa theo thực tế),,89,8900000
+02/08/2026,SANPHAM,Bộ dụng cụ lăn sơn 6 món (số mẫu — sửa theo thực tế),,120,6200000
+02/08/2026,SANPHAM,Sơn chống thấm 5L (số mẫu — sửa theo thực tế),,12,3100000
+02/08/2026,SANPHAM,Cọ sơn cán gỗ (số mẫu — sửa theo thực tế),,25,1800000`};
 
-/* ═══ TẢI DỮ LIỆU ═══ */
-let ROWS=[], WEEKS=[], CUR=null, CURMONTH=null, DEMO=false;
-let CONTENT=null, CONTENT_ERR=false; /* lịch content theo ngày — null = đang tải */
-
+/* ═══════════ NẠP DỮ LIỆU ═══════════ */
+function rowsToObjs(rows, map, reqKeys){
+  /* reqKeys: dòng chỉ được nhận khi ít nhất 1 cột trong danh sách có dữ liệu — để bỏ qua các ô vàng mẫu chưa điền */
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]; if(!r || !cl(r[0]) || !dmy(r[0])) continue;
+    const o={d:dmy(r[0])};
+    for(const k in map){ const c=map[k]; o[k] = c.n ? (cl(r[c.i])===''?null:num(r[c.i])) : cl(r[c.i]); }
+    const keys=reqKeys||Object.keys(map);
+    if(!keys.some(k=>o[k]!==null&&o[k]!==''&&o[k]!==undefined)) continue;
+    out.push(o);
+  }
+  return out;
+}
+const MAPS = {
+  tq:  {gmv:{i:1,n:1},ads:{i:2,n:1},chi:{i:3,n:1},don:{i:4,n:1},xem:{i:5,n:1},fol:{i:6,n:1},note:{i:7}},
+  vid: {ten:{i:1},dang:{i:2},loai:{i:3},nguon:{i:4},gmv:{i:5,n:1},don:{i:6,n:1},xem:{i:7,n:1},tim:{i:8,n:1},bl:{i:9,n:1},cs:{i:10,n:1},luu:{i:11,n:1},dg:{i:12}},
+  nx:  {loai:{i:1},nd:{i:2},ghi:{i:3},mon:{i:4,n:1},gmv:{i:5,n:1}}
+};
+/* DUAN dạng 2 cột song song: NGAY | DU_AN | MUC | GENZ | THANHBINH | CHUNG — mỗi dòng tách thành tối đa 3 bản ghi */
+function parseDuan(rows){
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]; if(!r||!dmy(cl(r[0]))) continue;
+    const d=dmy(cl(r[0])), duAn=cl(r[1]), muc=cl(r[2]);
+    if(!duAn||!muc) continue;
+    if(cl(r[3])) out.push({d,duAn,team:'GENZ',muc,nd:cl(r[3])});
+    if(cl(r[4])) out.push({d,duAn,team:'THANHBINH',muc,nd:cl(r[4])});
+    if(cl(r[5])) out.push({d,duAn,team:'',muc,nd:cl(r[5])});
+  }
+  return out;
+}
+async function fetchTab(key,tab){
+  const gid=GIDS[tab];
+  if(gid===null||gid===undefined||gid===''){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
+  try{
+    const r=await fetch(tabUrl(gid));
+    if(!r.ok) throw 0;
+    const t=await r.text();
+    if(t.trim().startsWith('<')) throw 0;
+    return parseCSV(t);
+  }catch(e){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
+}
 async function loadContent(){
   try{
     const r=await fetch(CONTENT_CSV_URL);
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok) throw 0;
     const t=await r.text();
-    if(t.trim().startsWith('<')) throw new Error('Sheet chưa công khai');
-    /* cột: 0 Mã · 1 Title · 2 Loại · 5 Lịch quay · 6 Deadline · 7 Ngày Air · 8 Người làm · 9 Đã quay · 10 Đã dựng · 11 Tiến độ · 12 Trạng thái */
-    CONTENT=parseCSV(t).slice(1).filter(r2=>cl(r2[1]));
+    if(t.trim().startsWith('<')) throw 0;
+    CONTENT=parseCSV(t).slice(1).filter(x=>cl(x[1]));
   }catch(e){ CONTENT_ERR=true; }
-  if(CUR) renderWeek(CUR);
+  if(RA) render();
 }
-
-/* dd/mm[/yyyy] → Date (yyyy thiếu thì lấy năm fallback) */
-function dmy(s,fbYear){
-  const m=cl(s).match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/);
-  if(!m) return null;
-  return new Date(+(m[3]||fbYear||new Date().getFullYear()), +m[2]-1, +m[1]);
-}
-/* khoảng ngày của tuần từ chuỗi range "27/07 – 02/08/2026" */
-function weekSpan(wk){
-  const ms=[...cl(wk.range).matchAll(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/g)];
-  if(ms.length<2) return null;
-  const yEnd=+(ms[ms.length-1][3]||wk.y), yStart=+(ms[0][3]||yEnd);
-  const a=new Date(yStart,+ms[0][2]-1,+ms[0][1]), b=new Date(yEnd,+ms[ms.length-1][2]-1,+ms[ms.length-1][1]);
-  return a<=b?[a,b]:[new Date(yEnd-1,+ms[0][2]-1,+ms[0][1]),b]; /* tuần vắt qua năm */
-}
-
 async function load(){
-  let text=null, lastErr=null;
-  for(const u of sheetUrls()){
-    try{
-      const r=await fetch(u);
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const t=await r.text();
-      if(t.trim().startsWith('<')) throw new Error('Sheet chưa công khai');
-      text=t; break;
-    }catch(e){ lastErr=e; }
-  }
-  loadContent(); /* lịch content tải song song, xong tự vẽ thêm */
-  if(text===null){ boot(parseCSV(DEMO_CSV)); DEMO=true; note('⚠️ Không đọc được Google Sheet ('+esc(lastErr&&lastErr.message||'')+') — đang hiển thị <b>SỐ LIỆU MẪU</b>.'); return; }
-  const rows=parseCSV(text);
-  const ok=rows.some(r=>cl(r[0])==='META' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(cl(r[1])));
-  if(!ok){ boot(parseCSV(DEMO_CSV)); DEMO=true;
-    note('⚠️ Sheet chưa có dữ liệu theo <b>cấu trúc mới</b> (cột B = mã tuần dạng 2026-08-1) — đang hiển thị <b>SỐ LIỆU MẪU</b>. Dán nội dung file <b>MAU-SHEET-BAO-CAO-MOI.csv</b> vào Sheet là chạy.');
-    return; }
-  boot(rows);
-}
-let NOTE='';
-function note(html){ NOTE='<div class="banner">'+html+'</div>'; renderWeek(CUR); }
-
-function boot(rows){
-  ROWS=rows;
-  WEEKS=rows.filter(r=>cl(r[0])==='META' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(cl(r[1])))
-    .map(r=>{ const m=cl(r[1]).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-      return {code:cl(r[1]), y:+m[1], m:+m[2], w:+m[3], range:cl(r[2]), updated:cl(r[3])}; })
-    .sort((a,b)=>(a.y*10000+a.m*100+a.w)-(b.y*10000+b.m*100+b.w));
-  if(!WEEKS.length){ document.getElementById('app').innerHTML='<div class="empty">Chưa có tuần nào trong Sheet.</div>'; return; }
-  const last=WEEKS[WEEKS.length-1];
-  CUR=last.code; CURMONTH=last.m;
+  const [tq,vid,duan,nx] = await Promise.all([
+    fetchTab('tq','TONGQUAN'), fetchTab('vid','VIDEO'), fetchTab('duan','DUAN'), fetchTab('nx','NHANXET')
+  ]);
+  loadContent();
+  const fix=r=>{ if(r.dang!==undefined) r.dang=dmy(r.dang); return r; };
+  DB.tq=rowsToObjs(tq,MAPS.tq,['gmv','ads','chi','don','xem','fol']);
+  DB.vid=rowsToObjs(vid,MAPS.vid,['ten']).map(fix);
+  DB.duan=parseDuan(duan); DB.nx=rowsToObjs(nx,MAPS.nx,['nd']);
+  const all=[...DB.tq,...DB.vid,...DB.duan,...DB.nx].map(o=>o.d).filter(Boolean);
+  const maxD = all.length ? new Date(Math.max(...all.map(d=>d.getTime()))) : new Date(2026,6,27);
+  /* mặc định: tuần (T2→CN) chứa ngày mới nhất có dữ liệu */
+  const dow=(maxD.getDay()+6)%7;
+  RA=addD(maxD,-dow); RB=addD(RA,6);
+  CURMONTH=RA.getMonth()+1; CURYEAR=RA.getFullYear();
   document.getElementById('filterbar').style.display='';
+  document.getElementById('navTabs').style.display='';
   document.getElementById('toolbar').style.display='';
-  renderFilters(); renderWeek(CUR);
+  render();
 }
 
-/* ═══ BỘ LỌC THÁNG → TUẦN ═══ */
+/* ═══════════ LỌC THEO KHOẢNG NGÀY ═══════════ */
+const inR=(d,a,b)=>d&&d>=a&&d<=b;
+const rowsIn=(arr,a,b)=>arr.filter(o=>inR(o.d,a||RA,b||RB));
+function prevRange(){ const len=Math.round((RB-RA)/864e5)+1; return [addD(RA,-len), addD(RA,-1)]; }
+const sum=(arr,k)=>arr.reduce((t,o)=>t+(Number(o[k])||0),0);
+function dataDates(){ const s=new Set(); [...DB.tq,...DB.vid,...DB.duan,...DB.nx].forEach(o=>o.d&&s.add(iso(o.d))); return s; }
+
+function rangeLabel(){
+  const days=Math.round((RB-RA)/864e5)+1;
+  const mStart=new Date(RA.getFullYear(),RA.getMonth(),1), mEnd=new Date(RA.getFullYear(),RA.getMonth()+1,0);
+  if(sameD(RA,mStart)&&sameD(RB,mEnd)) return ['Cả tháng '+(RA.getMonth()+1)+'/'+RA.getFullYear(),'BÁO CÁO THÁNG'];
+  if(days===7 && (RA.getDay()+6)%7===0) return ['Tuần '+ddmm(RA)+' – '+ddmm(RB)+'/'+RB.getFullYear(),'BÁO CÁO TUẦN'];
+  return [ddmm(RA)+'/'+RA.getFullYear()+' – '+ddmm(RB)+'/'+RB.getFullYear(),days+' NGÀY'];
+}
+
+/* ═══════════ BỘ LỌC: THÁNG 1 DÒNG + LỊCH ═══════════ */
 function renderFilters(){
-  const months=[...new Set(WEEKS.map(w=>w.m))];
+  const dset=dataDates();
+  const monthsWith=new Set([...dset].map(s=>+s.slice(5,7)));
   let mh='';
-  for(let m=1;m<=12;m++){
-    const has=months.includes(m);
-    mh+='<button class="chip'+(m===CURMONTH?' on':'')+'" '+(has?'onclick="pickMonth('+m+')"':'disabled')+'>T'+m+'</button>';
-  }
+  for(let m=1;m<=12;m++)
+    mh+='<button class="chip'+(m===CURMONTH?' on':'')+'" onclick="pickMonth('+m+')">T'+m+'</button>';
   document.getElementById('monthChips').innerHTML=mh;
-  const wks=WEEKS.filter(w=>w.m===CURMONTH);
-  document.getElementById('weekChips').innerHTML=wks.map(w=>
-    '<button class="chip wk'+(w.code===CUR?' on':'')+'" onclick="pickWeek(\''+w.code+'\')">Tuần '+w.w+' <span class="small">('+esc(w.range||'')+')</span></button>'
-  ).join('');
-}
-function pickMonth(m){ CURMONTH=m; const wks=WEEKS.filter(w=>w.m===m); CUR=wks[wks.length-1].code; renderFilters(); renderWeek(CUR); }
-function pickWeek(c){ CUR=c; CURMONTH=WEEKS.find(w=>w.code===c).m; renderFilters(); renderWeek(c); }
 
-/* ═══ RENDER 1 TUẦN ═══ */
-const by=(t,c)=>ROWS.filter(r=>cl(r[0])===t && cl(r[1])===c);
-
-function renderWeek(code){
-  const wk=WEEKS.find(w=>w.code===code); if(!wk) return;
-  const idx=WEEKS.indexOf(wk), prev=idx>0?WEEKS[idx-1]:null;
-  document.getElementById('hsub').innerHTML=
-    '更新時間 Cập nhật: <b>'+esc(wk.updated||'—')+'</b> · 本週 Tuần đang xem: <b>Tuần '+wk.w+' tháng '+wk.m+' ('+esc(wk.range)+')</b>';
-
-  /* — bản đã sửa tay? — */
-  const saved=localStorage.getItem('loho2_edit_'+code);
-  if(saved && !editing){
-    document.getElementById('app').innerHTML=
-      '<div class="banner edited">✏️ Đang xem <b>bản đã sửa tay</b> của tuần này (chỉ hiện trên máy này).'+
-      '<button onclick="resetEdit()">↺ Về số liệu gốc</button></div>'+saved;
+  /* lịch tháng — chỉ hiện khi calOpen */
+  const box=document.getElementById('calBox');
+  if(!calOpen){
+    box.style.display='none';
+    const [lb,kind]=rangeLabel();
+    document.getElementById('rangeLabel').innerHTML='Đang xem: <b>'+lb+'</b> <span class="tag gold" style="margin-left:6px">'+kind+'</span>';
+    document.getElementById('hsub').innerHTML='本期 Kỳ đang xem: <b>'+lb+'</b> · trang tự đọc Google Sheet + lịch content';
     return;
   }
-
-  const kpiR=(by('KPI',code)[0])||[];
-  const kpiP=prev?((by('KPI',prev.code)[0])||[]):[];
-  const gmvRows=by('GMVVIDEO',code), vidRows=by('VIDEO',code), clipRows=by('CLIP',code),
-        quaySau=by('QUAYSAU',code), spRows=by('SANPHAM',code), nxRows=by('NHANXET',code),
-        khRows=by('KEHOACH',code), trRows=by('TREND',code), duanRows=by('DUAN',code);
-
-  let h=NOTE; NOTE='';
-
-  /* ① KPI */
-  const vidCount = cl(kpiR[5])!=='' ? kpiR[5] : String(vidRows.length||'');
-  h+=sec('①','本週關鍵指標','KPI Tổng Quan Tuần','','so với tuần trước — trang tự tính');
-  h+='<div class="kpis">'
-    +kpiCard('影片GMV','GMV từ Video',fmtMoney(kpiR[2]),'',pctBadge(num(kpiR[2]),prev?num(kpiP[2]):null))
-    +kpiCard('訂單','Đơn hàng từ video',fmtN(kpiR[3]),'món',pctBadge(num(kpiR[3]),prev?num(kpiP[3]):null))
-    +kpiCard('觀看','Tổng lượt xem',fmtN(kpiR[4]),'',pctBadge(num(kpiR[4]),prev?num(kpiP[4]):null))
-    +kpiCard('影片數','Video đã đăng',fmtN(vidCount),'video',pctBadge(num(vidCount),prev?num(cl(kpiP[5])!==''?kpiP[5]:by('VIDEO',prev.code).length):null))
-    +kpiCard('粉絲','Follower tăng ròng',(num(kpiR[6])>0?'+':'')+fmtN(kpiR[6]),'người',pctBadge(num(kpiR[6]),prev?num(kpiP[6]):null))
-    +'</div>';
-
-  /* ② GMV video — ads vs organic */
-  h+=sec('②','影片GMV來源','GMV Theo Video — Quảng Cáo vs Organic','⭐','video nào ra tiền · nguồn từ chạy quảng cáo hay organic');
-  if(!gmvRows.length) h+=emptyMsg('GMVVIDEO');
-  else{
-    let ads=0,org=0;
-    gmvRows.forEach(r=>{ (cl(r[4]).toUpperCase().startsWith('A')?ads+=num(r[3]):org+=num(r[3])); });
-    const tot=ads+org, pAds=tot?Math.round(ads/tot*100):0, pOrg=tot?100-pAds:0;
-    const maxG=Math.max(...gmvRows.map(r=>num(r[3])),1);
-    h+='<div class="split"><div class="card donutwrap">'
-      +'<div class="donut" style="background:conic-gradient(var(--red) 0 '+pAds+'%, var(--green) '+pAds+'% 100%)">'
-      +'<div class="mid"><b>'+fmtMoney(tot)+'</b><span>tổng GMV video</span></div></div>'
-      +'<div class="leg">'
-      +'<div class="row"><span class="dot" style="background:var(--red)"></span>廣告 Quảng cáo <b>'+pAds+'% · '+fmtMoney(ads)+'</b></div>'
-      +'<div class="row"><span class="dot" style="background:var(--green)"></span>自然 Organic <b>'+pOrg+'% · '+fmtMoney(org)+'</b></div>'
-      +'</div></div>';
-    h+='<div class="tblwrap"><table><tr><th>影片 Video</th><th class="r">GMV</th><th class="c">來源 Nguồn</th><th>評估 Đánh giá</th></tr>'
-      +gmvRows.map(r=>{
-        const isAds=cl(r[4]).toUpperCase().startsWith('A');
-        return '<tr><td class="vidname">'+esc(r[2])
-          +'<div class="bar"><i style="width:'+Math.round(num(r[3])/maxG*100)+'%"></i></div></td>'
-          +'<td class="r"><b>'+fmtMoney(r[3])+'</b></td>'
-          +'<td class="c"><span class="tag '+(isAds?'ads':'org')+'">'+(isAds?'🅐 Quảng cáo':'🅞 Organic')+'</span></td>'
-          +'<td class="small">'+esc(r[5]||'')+'</td></tr>';
-      }).join('')+'</table></div></div>';
-  }
-
-  /* ③ Video đã đăng */
-  h+=sec('③','本週發布影片','Video Đã Đăng Trong Tuần','','tuần này đăng '+(vidRows.length||0)+' video');
-  if(!vidRows.length) h+=emptyMsg('VIDEO');
-  else{
-    const groups={}; vidRows.forEach(r=>{ const g=cl(r[3])||'Khác'; groups[g]=(groups[g]||0)+1; });
-    h+='<div class="secnote">Chủ đề: '+Object.entries(groups).map(([g,n])=>'<span class="tag">'+esc(g)+' × '+n+'</span>').join(' ')+'</div>';
-    h+='<div class="tblwrap"><table><tr><th>影片 Video</th><th>主題 Chủ đề</th><th class="c">Ngày đăng</th><th class="r">👁️ Xem</th><th class="r">❤️ Thích</th><th class="r">💬 Bình luận</th><th class="r">↗️ Chia sẻ</th><th class="r">🔖 Lưu</th><th>評估 Đánh giá</th></tr>'
-      +vidRows.map(r=>'<tr><td class="vidname">'+esc(r[2])+'</td><td><span class="tag">'+esc(r[3]||'—')+'</span></td>'
-        +'<td class="c small">'+esc(r[4]||'')+'</td>'
-        +'<td class="r"><b>'+fmtN(r[5])+'</b></td><td class="r">'+fmtN(r[6])+'</td><td class="r">'+fmtN(r[7])+'</td>'
-        +'<td class="r">'+fmtN(r[8])+'</td><td class="r">'+fmtN(r[9])+'</td>'
-        +'<td class="small">'+esc(r[10]||'')+'</td></tr>').join('')+'</table></div>';
-  }
-
-  /* ④ Tiến độ sản xuất */
-  h+=sec('④','製作進度','Tiến Độ Sản Xuất (Quay – Dựng – Đăng)','','trạng thái từng clip + kế hoạch quay tuần sau');
-  if(!clipRows.length && !quaySau.length) h+=emptyMsg('CLIP / QUAYSAU');
-  else{
-    const cnt={DADANG:0,CHOEDIT:0,CHUAQUAY:0,YTUONG:0};
-    clipRows.forEach(r=>{ const s=cl(r[3]).toUpperCase(); if(cnt[s]!==undefined) cnt[s]++; });
-    h+='<div class="pipestats">'
-      +'<div class="pipestat"><b>'+clipRows.length+'</b><span>tổng clip theo dõi</span></div>'
-      +'<div class="pipestat"><b>'+cnt.DADANG+'</b><span>✅ đã đăng</span></div>'
-      +'<div class="pipestat"><b>'+cnt.CHOEDIT+'</b><span>🎬 chờ edit</span></div>'
-      +'<div class="pipestat"><b>'+cnt.CHUAQUAY+'</b><span>📝 chưa quay</span></div>'
-      +'<div class="pipestat"><b>'+cnt.YTUONG+'</b><span>💡 ý tưởng</span></div></div>';
-    if(clipRows.length)
-      h+='<div class="tblwrap"><table><tr><th>Clip</th><th class="c">狀態 Trạng thái</th><th>Ghi chú</th></tr>'
-        +clipRows.map(r=>{ const s=CLIP_ST[cl(r[3]).toUpperCase()]||['ytuong',esc(r[3])];
-          return '<tr><td class="vidname">'+esc(r[2])+'</td><td class="c"><span class="st '+s[0]+'">'+s[1]+'</span></td><td class="small">'+esc(r[4]||'')+'</td></tr>'; }).join('')
-        +'</table></div>';
-    if(quaySau.length)
-      h+='<div class="bullets">'+quaySau.map(r=>'<div class="b"><span class="ic">🎥</span><div><b>Kế hoạch quay: '
-        +esc(r[2])+'</b> — '+esc(r[3]||'')+' clip dự kiến. <span class="small">'+esc(r[4]||'')+'</span></div></div>').join('')+'</div>';
-  }
-
-  /* ④b Lịch content theo ngày — tự đọc từ Sheet LỊCH ĐĂNG, lọc theo tuần đang xem */
-  h+='<div class="secnote" style="margin-top:16px">📅 <b>日曆 Lịch Content Theo Ngày</b> — trang tự đọc từ Sheet quản lý content, lọc đúng tuần đang xem</div>';
-  if(CONTENT_ERR)
-    h+='<div class="empty">Không đọc được Sheet lịch content — kiểm tra Sheet còn công khai không.</div>';
-  else if(CONTENT===null)
-    h+='<div class="empty">Đang tải lịch content…</div>';
-  else{
-    const span=weekSpan(wk);
-    if(!span) h+='<div class="empty">Không đọc được khoảng ngày của tuần này (dòng META cột C cần dạng «27/07 – 02/08/2026»).</div>';
-    else{
-      const inWk=d=>d && d>=span[0] && d<=span[1];
-      const rows=CONTENT.filter(r=>{
-        if(cl(r[12]).toUpperCase().includes('HỦY')) return false;
-        return inWk(dmy(r[7],wk.y)) || inWk(dmy(r[5],wk.y)) || inWk(dmy(r[6],wk.y));
-      });
-      if(!rows.length) h+='<div class="empty">Tuần này chưa có video nào trong lịch content.</div>';
-      else{
-        const P=s=>cl(s).toUpperCase();
-        const aired=rows.filter(r=>inWk(dmy(r[7],wk.y)) && (P(r[11])==='DONE'||P(r[12])==='AIR')).length;
-        const editing2=rows.filter(r=>P(r[11]).includes('EDIT')).length;
-        const late=rows.filter(r=>P(r[11]).includes('TRỄ')).length;
-        const notyet=rows.filter(r=>P(r[11]).includes('CHƯA')).length;
-        h+='<div class="pipestats">'
-          +'<div class="pipestat"><b>'+rows.length+'</b><span>📋 video trong tuần</span></div>'
-          +'<div class="pipestat"><b>'+aired+'</b><span>✅ đã đăng (air)</span></div>'
-          +'<div class="pipestat"><b>'+editing2+'</b><span>🎬 đang edit</span></div>'
-          +'<div class="pipestat"><b>'+late+'</b><span>⏰ trễ deadline</span></div>'
-          +'<div class="pipestat"><b>'+notyet+'</b><span>📝 chưa bắt đầu</span></div></div>';
-        const badge=t=>{ const u=P(t);
-          if(u==='DONE') return '<span class="st dadang">✅ Done</span>';
-          if(u.includes('EDIT')) return '<span class="st choedit">🎬 '+esc(t)+'</span>';
-          if(u.includes('TRỄ')) return '<span class="st chuaquay">⏰ '+esc(t)+'</span>';
-          return '<span class="st ytuong">'+esc(t||'—')+'</span>'; };
-        h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>影片 Video</th><th>Loại</th><th>Người làm</th><th class="c">quay/dựng</th><th class="c">進度 Tiến độ</th><th class="c">Duyệt</th></tr>'
-          +rows.slice().sort((a,b)=>(dmy(a[7],wk.y)||dmy(a[6],wk.y)||span[1])-(dmy(b[7],wk.y)||dmy(b[6],wk.y)||span[1]))
-            .map(r=>'<tr><td class="c">'+esc(cl(r[7])?cl(r[7]).split('/').slice(0,2).join('/'):'—')
-              +'</td><td class="vidname">'+esc(r[1])+(cl(r[0])?' <span class="small">('+esc(r[0])+')</span>':'')
-              +'</td><td class="small">'+esc(r[2]||'—')+'</td><td class="small">'+esc(r[8]||'—')
-              +'</td><td class="c small">'+(P(r[9])==='TRUE'?'🎥':'·')+' '+(P(r[10])==='TRUE'?'✂️':'·')
-              +'</td><td class="c">'+badge(r[11])+'</td><td class="c small">'+esc(r[12]||'—')+'</td></tr>').join('')
-          +'</table></div>';
-      }
+  box.style.display='';
+  const y=CURYEAR, m=CURMONTH-1;
+  const first=new Date(y,m,1), last=new Date(y,m+1,0);
+  const lead=(first.getDay()+6)%7;
+  let cal='<div class="calhead"><span></span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div>';
+  let d=addD(first,-lead), wi=1;
+  while(d<=last){
+    const mon=d;
+    cal+='<div class="calrow"><button class="wkbtn" onclick="pickWeekOf(\''+iso(mon)+'\')" title="Chọn nguyên tuần">T'+wi+'</button>';
+    for(let i=0;i<7;i++){
+      const out=d.getMonth()!==m;
+      const cls=['day']; if(out)cls.push('out');
+      if(dset.has(iso(d)))cls.push('dot');
+      if(inR(d,RA,RB))cls.push('inr');
+      if(sameD(d,RA)||sameD(d,RB))cls.push('edge');
+      if(pickStart&&sameD(d,pickStart))cls.push('edge');
+      cal+='<button class="'+cls.join(' ')+'" onclick="pickDay(\''+iso(d)+'\')">'+d.getDate()+'</button>';
+      d=addD(d,1);
     }
+    cal+='</div>'; wi++;
   }
+  cal+='<div class="calfoot"><button class="chip" onclick="pickWholeMonth()">Cả tháng '+CURMONTH+'</button><button class="chip" onclick="pickLast7()">7 ngày dữ liệu mới nhất</button></div>';
+  cal+='<div class="hint">Bấm nút <b>T«n»</b> đầu hàng chọn nguyên tuần · bấm <b>ngày đầu rồi ngày cuối</b> tự chọn khoảng · chấm nâu = ngày có dữ liệu</div>';
+  box.innerHTML=cal;
 
-  /* ⑤ Top trong tuần */
-  h+=sec('⑤','本週之最','Top Trong Tuần','','trang tự tìm từ bảng ② và ③');
-  const bestGmv = gmvRows.length? gmvRows.reduce((a,b)=>num(b[3])>num(a[3])?b:a) : null;
-  const bestView= vidRows.length? vidRows.reduce((a,b)=>num(b[5])>num(a[5])?b:a) : null;
-  if(!bestGmv && !bestView && !spRows.length) h+=emptyMsg('SANPHAM');
-  else{
-    h+='<div class="tops">';
-    if(bestGmv) h+='<div class="topcard"><div class="lb">🥇 影片GMV第一 · Video ra nhiều tiền nhất</div>'
-      +'<div class="name">'+esc(bestGmv[2])+'</div><div class="num">'+fmtMoney(bestGmv[3])
-      +' <span>· '+(cl(bestGmv[4]).toUpperCase().startsWith('A')?'từ quảng cáo':'organic')+'</span></div></div>';
-    if(bestView) h+='<div class="topcard"><div class="lb">👁️ 觀看第一 · Video nhiều view nhất</div>'
-      +'<div class="name">'+esc(bestView[2])+'</div><div class="num">'+fmtN(bestView[5])+' <span>lượt xem</span></div></div>';
-    h+='</div>';
-    if(spRows.length){
-      h+='<div class="secnote" style="margin-top:16px">🏆 <b>熱銷產品 Sản phẩm bán chạy nhất từ video TikTok</b></div>'
-        +'<div class="tblwrap"><table><tr><th class="c">#</th><th>產品 Sản phẩm</th><th class="r">Số món</th><th class="r">GMV</th></tr>'
-        +spRows.map((r,i)=>'<tr><td class="c">'+(i<3?['🥇','🥈','🥉'][i]:(i+1))+'</td><td class="vidname">'+esc(r[2])
-          +'</td><td class="r">'+fmtN(r[3])+'</td><td class="r"><b>'+fmtMoney(r[4])+'</b></td></tr>').join('')+'</table></div>';
-    }
+  const [lb,kind]=rangeLabel();
+  document.getElementById('rangeLabel').innerHTML='Đang xem: <b>'+lb+'</b> <span class="tag gold" style="margin-left:6px">'+kind+'</span>'+(pickStart?' · <span class="small">đã chọn ngày đầu <b>'+ddmm(pickStart)+'</b> — bấm ngày cuối</span>':'');
+  document.getElementById('hsub').innerHTML='本期 Kỳ đang xem: <b>'+lb+'</b> · trang tự đọc Google Sheet + lịch content';
+}
+function pickMonth(m){
+  if(m===CURMONTH && calOpen){ calOpen=false; renderFilters(); return; }  /* bấm lại chip đang mở = đóng lịch */
+  CURMONTH=m; pickStart=null; calOpen=true;
+  renderFilters();
+}
+function pickDay(s){
+  const d=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));
+  if(!pickStart){ pickStart=d; renderFilters(); return; }
+  RA=pickStart<=d?pickStart:d; RB=pickStart<=d?d:pickStart; pickStart=null; calOpen=false; render();
+}
+function pickWeekOf(s){ const d=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); RA=d; RB=addD(d,6); pickStart=null; calOpen=false; render(); }
+function pickWholeMonth(){ RA=new Date(CURYEAR,CURMONTH-1,1); RB=new Date(CURYEAR,CURMONTH,0); pickStart=null; calOpen=false; render(); }
+function pickLast7(){ const all=[...dataDates()].sort(); if(!all.length)return; const s=all[all.length-1]; RB=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); RA=addD(RB,-6); CURMONTH=RB.getMonth()+1; pickStart=null; calOpen=false; render(); }
+
+/* ═══════════ NAV 4 MỤC ═══════════ */
+const SECS=[
+  {id:'s1',zh:'總覽',t:'① Tổng quan'},
+  {id:'s2',zh:'影片',t:'② Video'},
+  {id:'s3',zh:'專案',t:'③ Dự án'}];
+function renderNav(){
+  document.getElementById('navTabs').innerHTML=SECS.map(s=>
+    '<button class="nb'+(s.id===SEC?' on':'')+'" onclick="goSec(\''+s.id+'\')"><span class="t">'+s.t+'</span></button>').join('');
+}
+function goSec(id){ SEC=id; render(); }
+
+/* ═══════════ RENDER ═══════════ */
+function pctBadge(cur,prev){
+  if(prev==null||prev===0||cur==null) return '<span class="badge fl">— chưa có kỳ trước</span>';
+  const p=(cur-prev)/Math.abs(prev)*100;
+  if(Math.abs(p)<0.05) return '<span class="badge fl">= bằng kỳ trước</span>';
+  return p>0?'<span class="badge up">▲ +'+p.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% so kỳ trước</span>'
+            :'<span class="badge dn">▼ '+p.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% so kỳ trước</span>';
+}
+function kpi(zh,vi,val,badge){ return '<div class="kpi"><div class="lb"><span class="zh">'+zh+'</span>'+vi+'</div><div class="val">'+val+'</div>'+badge+'</div>'; }
+function secTitle(zh,vi,star,note){ return '<div class="sec"><h2><span class="zh">'+zh+'</span>'+vi+'</h2>'+(star?'<span class="star">sếp nhấn mạnh</span>':'')+'</div>'+(note?'<div class="secnote">'+note+'</div>':''); }
+function emptyMsg(t){ return '<div class="empty">'+t+'</div>'; }
+
+function banner(){
+  let h='';
+  if(DEMOTABS.length)
+    h+='<div class="banner">Tab <b>'+DEMOTABS.join(', ')+'</b> đang dùng <b>SỐ LIỆU MẪU</b> — sau khi bạn nạp file <b>BAO-CAO-TIKTOK-LOHO.xlsx</b> lên Google Sheet, nhắn Claude liên kết là số thật tự chạy.</div>';
+  return h;
+}
+
+function render(){
+  renderFilters(); renderNav();
+  const key='loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB);
+  const saved=localStorage.getItem(key);
+  if(saved && !editing){
+    document.getElementById('app').innerHTML='<div class="banner">Đang xem <b>bản đã sửa tay</b> (chỉ máy này thấy).<button onclick="resetEdit()">Về số liệu gốc</button></div>'+saved;
+    return;
   }
-
-  /* ⑥ Nhận xét */
-  h+=sec('⑥','本週評估','Nhận Xét Tuần Này','','');
-  h+= nxRows.length
-    ? '<div class="bullets">'+nxRows.map(r=>{ const good=cl(r[2]).toUpperCase().startsWith('T');
-        return '<div class="b"><span class="ic">'+(good?'✅':'⚠️')+'</span><div>'+esc(r[3])+'</div></div>'; }).join('')+'</div>'
-    : emptyMsg('NHANXET');
-
-  /* ⑦ Kế hoạch tuần tới */
-  h+=sec('⑦','下週影片計畫','Kế Hoạch Video Tuần Tới','','video dự kiến · ngày đăng · gắn sale gì');
-  h+= khRows.length
-    ? '<div class="tblwrap"><table><tr><th>影片 Video dự kiến</th><th class="c">Ngày đăng</th><th>促銷 Gắn sale</th></tr>'
-      +khRows.map(r=>'<tr><td class="vidname">'+esc(r[2])+'</td><td class="c">'+esc(r[3]||'—')
-        +'</td><td>'+(cl(r[4])?'<span class="tag gold">🏷️ '+esc(r[4])+'</span>':'<span class="small">—</span>')+'</td></tr>').join('')+'</table></div>'
-    : emptyMsg('KEHOACH');
-
-  /* ⑧ Trend */
-  h+=sec('⑧','本週趨勢','Trend TikTok Tuần Này','','trend gì đang hot · mình có quay theo không');
-  h+= trRows.length
-    ? '<div class="tblwrap"><table><tr><th>趨勢 Trend</th><th class="c">Có quay theo?</th><th>Ghi chú / lý do</th></tr>'
-      +trRows.map(r=>{ const s=TREND_ST[cl(r[3]).toUpperCase()]||['ytuong',esc(r[3]||'—')];
-        return '<tr><td class="vidname">'+esc(r[2])+'</td><td class="c"><span class="st '+s[0]+'">'+s[1]+'</span></td><td class="small">'+esc(r[4]||'')+'</td></tr>'; }).join('')+'</table></div>'
-    : emptyMsg('TREND');
-
-  /* ⑨ Dự án riêng — dropdown gom dự án của MỌI tuần, chọn mới hiện, kèm lịch sử các tuần trước */
-  h+=sec('⑨','專案追蹤','Dự Án Riêng (chọn mới hiện)','⭐','dự án theo mùa — chọn trong ô dưới để xem chi tiết + lịch sử các tuần');
-  const allDuan=ROWS.filter(r=>cl(r[0])==='DUAN').map(r=>r.map(cl));
-  const projs=[...new Set(allDuan.map(r=>r[2]).filter(Boolean))];
-  if(!projs.length) h+=emptyMsg('DUAN');
-  else{
-    h+='<div class="projbox"><select id="projSel" onchange="showProj(this.value)">'
-      +'<option value="">— 選擇專案 Chọn dự án để xem —</option>'
-      +projs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('')
-      +'</select><div id="projBody"></div></div>';
-    window.__duan=allDuan; window.__duanCode=code;
-  }
-
+  let h=banner();
+  if(SEC==='s1')h+=renderS1(); else if(SEC==='s2')h+=renderS2(); else h+=renderS3();
   document.getElementById('app').innerHTML=h;
-  if(window.__projKeep && projs && projs.includes(window.__projKeep)){
-    const s=document.getElementById('projSel');
-    if(s){ s.value=window.__projKeep; showProj(window.__projKeep); }
-  }
+  if(SEC==='s3'&&window.__projKeep){ const s=document.getElementById('projSel'); if(s&&[...s.options].some(o=>o.value===window.__projKeep)){ s.value=window.__projKeep; showProj(window.__projKeep);} }
   if(editing) enableEdit();
 }
 
-function sec(n,zh,vi,star,note){
-  return '<div class="sec"><span class="num">'+n+'</span><h2><span class="zh">'+zh+'</span>'+vi+'</h2>'
-    +(star?'<span class="star">'+star+' sếp nhấn mạnh</span>':'')+'</div>'
-    +(note?'<div class="secnote">'+note+'</div>':'');
+/* ── ① TỔNG QUAN ── */
+function renderS1(){
+  const [pa,pb]=prevRange();
+  const tq=rowsIn(DB.tq), tqP=rowsIn(DB.tq,pa,pb);
+  const vid=rowsIn(DB.vid), vidP=rowsIn(DB.vid,pa,pb);
+  const gmv=sum(tq,'gmv'), gmvP=sum(tqP,'gmv');
+  let ads=sum(tq,'ads'); if(!ads) ads=sum(vid.filter(v=>cl(v.nguon).toUpperCase().startsWith('A')),'gmv');
+  const org=Math.max(0,gmv-ads);
+  const newV=vid.filter(v=>inR(v.dang,RA,RB)), newVP=vidP.filter(v=>inR(v.dang,pa,pb));
+  let h=secTitle('本期總覽','Tổng Quan',1,'GMV video + nguồn ads/organic · trang tự tính % so với kỳ liền trước cùng độ dài');
+  h+='<div class="kpis">'
+    +kpi('影片GMV','GMV từ video',fmtMoney(gmv),pctBadge(gmv,tqP.length?gmvP:null))
+    +kpi('訂單','Đơn hàng từ video',fmtN(sum(tq,'don')||null),pctBadge(sum(tq,'don'),tqP.length?sum(tqP,'don'):null))
+    +kpi('觀看','Tổng lượt xem',fmtN(sum(tq,'xem')||null),pctBadge(sum(tq,'xem'),tqP.length?sum(tqP,'xem'):null))
+    +kpi('影片數','Video mới đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
+    +kpi('粉絲','Follower tăng ròng',(sum(tq,'fol')>0?'+':'')+fmtN(sum(tq,'fol')||null),pctBadge(sum(tq,'fol'),tqP.length?sum(tqP,'fol'):null))
+    +'</div>';
+  /* donut ads vs organic + hiệu quả ads/đơn */
+  const pAds=gmv?Math.round(ads/gmv*100):0;
+  const chi=sum(tq,'chi'), don=sum(tq,'don');
+  const roas=chi?ads/chi:null, aov=don?gmv/don:null;
+  h+='<div class="grid2"><div class="card"><h4>廣告 vs 自然 · GMV từ Quảng cáo vs Organic</h4>'
+    +'<div class="donutrow"><div class="donut" style="background:conic-gradient(var(--bad) 0 '+pAds+'%, var(--good) '+pAds+'% 100%)"></div>'
+    +'<div class="leg"><div><span class="sw" style="background:var(--bad)"></span><b>'+pAds+'%</b> Ads · '+fmtMoney(ads)+'</div>'
+    +'<div><span class="sw" style="background:var(--good)"></span><b>'+(100-pAds)+'%</b> Organic · '+fmtMoney(org)+'</div>'
+    +'<div class="small">'+(pAds<=30?'Kênh sống khoẻ bằng organic — nền tốt.':'Tỷ trọng ads đang cao — cần xem lại hiệu quả từng video ads.')+'</div></div></div></div>'
+    +'<div class="card"><h4>廣告效益 · Hiệu Quả Quảng Cáo & Đơn Hàng</h4>'
+    +'<div class="leg">'
+    +'<div>Chi phí ads: <b>'+(chi?fmtMoney(chi):'—')+'</b>'+(chi?'':' <span class="small">(điền cột CHI_PHI_ADS trong Sheet TONGQUAN là có)</span>')+'</div>'
+    +(roas!==null?'<div>ROAS: <b>'+roas.toLocaleString('vi-VN',{maximumFractionDigits:1})+'x</b> <span class="small">— 1đ ads thu về '+roas.toLocaleString('vi-VN',{maximumFractionDigits:1})+'đ GMV'+(roas>=3?' · ổn':' · hơi thấp, xem lại video ads')+'</span></div>':'')
+    +'<div>Giá trị đơn trung bình: <b>'+(aov?fmtMoney(aov):'—')+'</b>'+(aov?' <span class="small">/ đơn</span>':'')+'</div>'
+    +'<div>GMV / 1.000 lượt xem: <b>'+(sum(tq,'xem')?fmtMoney(gmv/sum(tq,'xem')*1000):'—')+'</b> <span class="small">— sức bán của mỗi nghìn view</span></div>'
+    +'</div></div></div>';
+  /* bar chart theo ngày */
+  const days=[]; for(let d=new Date(RA);d<=RB;d=addD(d,1)) days.push(new Date(d));
+  const byDay=days.map(d=>({d,v:sum(DB.tq.filter(o=>sameD(o.d,d)),'gmv')}));
+  const mx=Math.max(...byDay.map(o=>o.v),1);
+  h+='<div class="card" style="margin:12px 0"><h4>柱狀圖 GMV video theo ngày</h4><div class="chart">'
+    +byDay.map(o=>'<div class="bar" style="height:'+Math.max(2,o.v/mx*100)+'%">'+(byDay.length<=10&&o.v?'<b class="v">'+fmtMoney(o.v)+'</b>':'')+'<span class="tip">'+ddmm(o.d)+' · '+fmtMoney(o.v)+'</span></div>').join('')
+    +'</div><div class="xlabs">'+byDay.map((o,i)=>'<span>'+(days.length>14?(i%Math.ceil(days.length/10)===0?ddmm(o.d):''):ddmm(o.d))+'</span>').join('')+'</div></div>';
+  /* top 5 video doanh thu */
+  const medal=i=>i+1;
+  const top5G=vid.filter(v=>v.gmv).sort((a,b)=>b.gmv-a.gmv).slice(0,5);
+  if(top5G.length){
+    h+='<div class="secnote"><b>TOP 5 video tạo doanh thu nhiều nhất</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">GMV</th><th class="r">View</th><th class="r">Tim</th></tr>'
+      +top5G.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td></tr>').join('')+'</table></div>';
+  }
+  /* top 5 sản phẩm bán chạy + bán chậm */
+  const spAll=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='SANPHAM');
+  const sp=spAll.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,5);
+  if(sp.length){
+    h+='<div class="secnote"><b>TOP 5 sản phẩm bán chạy nhất từ video</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+      +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
+    const cham=spAll.slice().sort((a,b)=>((a.mon??a.gmv)||0)-((b.mon??b.gmv)||0)).slice(0,5);
+    h+='<div class="secnote"><b>TOP 5 sản phẩm bán chậm</b> — cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+      +cham.map((o,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
+    if(spAll.length<=5) h+='<div class="secnote">Điền đủ danh sách sản phẩm vào Sheet NHANXET (LOAI = SANPHAM) thì hai bảng chạy/chậm mới tách rõ — hiện mới có '+spAll.length+' sản phẩm.</div>';
+  }
+  /* top 5 video xem nhiều nhất TOÀN KÊNH — lấy bản ghi mới nhất của từng video (không giới hạn kỳ đang xem) */
+  const latestByVid={};
+  DB.vid.filter(v=>v.xem&&v.d<=RB).forEach(v=>{ const k=cl(v.ten); if(!latestByVid[k]||v.d>latestByVid[k].d) latestByVid[k]=v; });
+  const top3X=Object.values(latestByVid).sort((a,b)=>b.xem-a.xem).slice(0,5);
+  if(top3X.length){
+    h+='<div class="secnote"><b>TOP 5 video được xem nhiều nhất toàn kênh</b> — theo số liệu mới nhất đã nhập, không giới hạn tuần</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="r">View</th><th class="r">Tim</th><th class="r">Bình luận</th><th class="r">Chia sẻ</th></tr>'
+      +top3X.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="r"><b>'+fmtN(v.xem)+'</b></td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td></tr>').join('')+'</table></div>';
+  }
+  /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
+  h+=secTitle('評估','Nhận Xét Trong Kỳ',0,'trang tự phân tích từ số liệu — dòng TOT/CHUA trong Sheet (nếu có) hiện thêm bên dưới');
+  const auto=[];
+  if(tqP.length&&gmvP){ const p=(gmv-gmvP)/gmvP*100;
+    auto.push({g:p>=0,t:'GMV video đạt '+fmtMoney(gmv)+' — '+(p>=0?'tăng ':'giảm ')+Math.abs(p).toLocaleString('vi-VN',{maximumFractionDigits:1})+'% so với kỳ trước'}); }
+  if(newV.length){ const gNew=sum(newV,'gmv');
+    if(!gNew) auto.push({g:false,t:newV.length+' video mới đăng nhưng chưa video nào tạo doanh thu — GMV vẫn dựa vào kho video cũ'});
+    else auto.push({g:true,t:newV.length+' video mới đã tạo '+fmtMoney(gNew)+' GMV ('+Math.round(gNew/Math.max(gmv,1)*100)+'% tổng)'}); }
+  if(gmv) auto.push({g:pAds<=30,t:pAds<=30?'Organic chiếm '+(100-pAds)+'% GMV — kênh sống khoẻ không phụ thuộc quảng cáo':'Quảng cáo chiếm '+pAds+'% GMV — cần xem lại hiệu quả từng video ads'});
+  const engAll=sum(vid,'xem')?((sum(vid,'tim')+sum(vid,'bl')+sum(vid,'cs'))/sum(vid,'xem')*100):0;
+  if(engAll) auto.push({g:engAll>=2,t:'Tỷ lệ tương tác '+engAll.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% — '+(engAll>=2?'ổn':'hơi thấp, cần hook và kêu gọi tương tác mạnh hơn')});
+  const folS=sum(tq,'fol'); if(folS) auto.push({g:folS>0,t:'Follower '+(folS>0?'tăng ròng +':'giảm ')+fmtN(Math.abs(folS))+' trong kỳ'});
+  const nxAll=rowsIn(DB.nx);
+  const good=nxAll.filter(o=>cl(o.loai).toUpperCase()==='TOT'), bad=nxAll.filter(o=>cl(o.loai).toUpperCase()==='CHUA');
+  if(auto.length||good.length||bad.length){
+    h+='<div class="bullets">'
+      +auto.map(o=>'<div class="b"><span class="ic"><span class="tag '+(o.g?'org">TỐT':'ads">CHƯA')+'</span></span><div>'+esc(o.t)+'</div></div>').join('')
+      +good.map(o=>'<div class="b"><span class="ic"><span class="tag org">TỐT</span></span><div>'+esc(o.nd)+'</div></div>').join('')
+      +bad.map(o=>'<div class="b"><span class="ic"><span class="tag ads">CHƯA</span></span><div>'+esc(o.nd)+'</div></div>').join('')+'</div>';
+  } else h+=emptyMsg('Chưa đủ số liệu để phân tích.');
+  return h;
 }
-function kpiCard(zh,vi,val,unit,badge){
-  return '<div class="kpi"><div class="lb"><span class="zh">'+zh+'</span> '+vi+'</div>'
-    +'<div class="val">'+(val||'—')+(unit?' <span>'+unit+'</span>':'')+'</div>'+badge+'</div>';
-}
-function emptyMsg(t){ return '<div class="empty">— Chưa nhập dữ liệu mục này (dòng loại <b>'+t+'</b> trong Sheet) —</div>'; }
 
-/* dự án riêng — mục quen thuộc có tên đẹp, mục lạ (từ khoá mới trong Sheet) tự thành khối riêng */
+/* ── ② VIDEO ── */
+function renderS2(){
+  const [pa,pb]=prevRange();
+  const vid=rowsIn(DB.vid), vidP=rowsIn(DB.vid,pa,pb);
+  const newV=vid.filter(v=>inR(v.dang,RA,RB)), newVP=vidP.filter(v=>inR(v.dang,pa,pb));
+  const S=(a,k)=>sum(a,k);
+  const eng=S(vid,'xem')?((S(vid,'tim')+S(vid,'bl')+S(vid,'cs'))/S(vid,'xem')*100):0;
+  let h=secTitle('影片表現','Video Trong Kỳ',0,'video đăng trong kỳ · tương tác · mọi số đều so % với kỳ liền trước');
+  h+='<div class="kpis">'
+    +kpi('新影片','Video đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
+    +kpi('觀看','Lượt xem',fmtN(S(vid,'xem')||null),pctBadge(S(vid,'xem'),vidP.length?S(vidP,'xem'):null))
+    +kpi('愛心','Tim',fmtN(S(vid,'tim')||null),pctBadge(S(vid,'tim'),vidP.length?S(vidP,'tim'):null))
+    +kpi('留言','Bình luận',fmtN(S(vid,'bl')||null),pctBadge(S(vid,'bl'),vidP.length?S(vidP,'bl'):null))
+    +kpi('分享','Chia sẻ',fmtN(S(vid,'cs')||null),pctBadge(S(vid,'cs'),vidP.length?S(vidP,'cs'):null))
+    +kpi('收藏','Lượt lưu',fmtN(S(vid,'luu')||null),pctBadge(S(vid,'luu'),vidP.length?S(vidP,'luu'):null))
+    +kpi('互動率','Tỷ lệ tương tác',eng?eng.toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span>%</span>':'—','<span class="badge fl">(tim+bl+chia sẻ)/view</span>')
+    +'</div>';
+  /* bảng video mới */
+  /* tự đánh giá video khi cột đánh giá bỏ trống */
+  const avgV=newV.length?sum(newV,'xem')/newV.length:0;
+  const autoDg=v=>{
+    if(cl(v.dg)) return esc(v.dg);
+    const parts=[];
+    if(v.xem&&avgV) parts.push(v.xem>=avgV*1.4?'Tốt — view vượt trung bình tuần':(v.xem<=avgV*0.6?'Yếu view':'View mức trung bình'));
+    const e=v.xem?(((v.tim||0)+(v.bl||0)+(v.cs||0))/v.xem*100):0;
+    if(e) parts.push('tương tác '+(e>=3?'tốt':(e>=1.5?'ổn':'thấp')));
+    if(v.xem&&v.don) parts.push('chuyển đổi '+(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'%');
+    return parts.length?esc(parts.join(' · '))+' <span class="small">(tự đánh giá)</span>':'';
+  };
+  h+='<div class="secnote"><b>Video đăng trong kỳ</b> — cột đánh giá bỏ trống thì trang tự nhận xét</div>';
+  h+= newV.length
+    ? '<div class="tblwrap"><table><tr><th class="c">Ngày</th><th>Video</th><th>Loại</th><th class="r">View</th><th class="r">Tim</th><th class="r">BL</th><th class="r">Share</th><th class="r">Lưu</th><th>Đánh giá</th></tr>'
+      +newV.sort((a,b)=>(b.xem||0)-(a.xem||0)).map(v=>'<tr><td class="c">'+ddmm(v.dang)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="small">'+esc(v.loai||'—')+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td><td class="r">'+fmtN(v.luu)+'</td><td class="small">'+autoDg(v)+'</td></tr>').join('')+'</table></div>'
+    : emptyMsg('Kỳ này chưa có video mới trong Sheet VIDEO.');
+  /* video cũ vẫn ra tiền */
+  const oldG=vid.filter(v=>v.gmv&&!inR(v.dang,RA,RB)).sort((a,b)=>b.gmv-a.gmv);
+  if(oldG.length){
+    h+='<div class="secnote"><b>Video cũ vẫn ra tiền trong kỳ</b></div><div class="tblwrap"><table><tr><th>Video</th><th class="c">Nguồn</th><th class="r">GMV</th><th class="r">Đơn</th><th>Đánh giá</th></tr>'
+      +oldG.map(v=>'<tr><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="small">'+(cl(v.dg)?esc(v.dg):(v.xem&&v.don?'chuyển đổi '+(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'% <span class="small">(tự đánh giá)</span>':''))+'</td></tr>').join('')+'</table></div>';
+  }
+  /* lịch content — CHỈ trong khoảng thời gian đang lọc */
+  h+='<div class="secnote"><b>日曆 Lịch Content Cả Tháng</b> — tự đọc từ Sheet quản lý content, team cập nhật gì là trang thấy liền</div>';
+  h+=contentBlock(RA,RB,'Tháng này chưa có video nào trong lịch content.');
+  /* kế hoạch & trend tuần tới */
+  const nxAll=rowsIn(DB.nx);
+  const nxA2=addD(RB,1), nxB2=addD(RB,7);
+  h+=secTitle('下期計畫','Kế Hoạch Video Tuần Tới',0,'tuần tới ('+ddmm(nxA2)+' – '+ddmm(nxB2)+') sẽ up gì — trang tự lấy từ lịch content · muốn thêm ngoài lịch thì nhập LOAI = KEHOACH');
+  if(CONTENT_ERR||CONTENT===null) h+=emptyMsg('Chưa đọc được lịch content.');
+  else{
+    const P2=s=>cl(s).toUpperCase(); const fy2=nxA2.getFullYear();
+    const pd2=s=>{ const m=cl(s).match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/); return m?new Date(+(m[3]||fy2),+m[2]-1,+m[1]):null; };
+    const nwk=CONTENT.filter(r=>!P2(r[12]).includes('HỦY')&&inR(pd2(r[7]),nxA2,nxB2))
+      .sort((a,b)=>pd2(a[7])-pd2(b[7]));
+    if(nwk.length){
+      h+='<div class="bullets"><div class="b"><span class="ic">•</span><div>Tuần tới dự kiến up <b>'+nwk.length+' video</b></div></div></div>';
+      h+='<div class="tblwrap"><table><tr><th class="c">Ngày đăng</th><th>Video</th><th>Loại</th><th class="c">Tiến độ hiện tại</th><th class="c">Duyệt</th></tr>'
+        +nwk.map(r=>'<tr><td class="c">'+cl(r[7]).split('/').slice(0,2).join('/')+'</td><td class="vidname">'+esc(r[1])+(cl(r[0])?' <span class="small">('+esc(r[0])+')</span>':'')+'</td><td class="small">'+esc(r[2]||'—')+'</td><td class="c"><span class="st '+(P2(r[11])==='DONE'?'dadang">Done':(P2(r[11]).includes('EDIT')?'choedit">'+esc(r[11]):'ytuong">'+esc(r[11]||'—')))+'</span></td><td class="c small">'+esc(r[12]||'—')+'</td></tr>').join('')+'</table></div>';
+    } else h+=emptyMsg('Lịch content chưa có video nào cho tuần tới — cần lên lịch thêm.');
+  }
+  const kh=nxAll.filter(o=>cl(o.loai).toUpperCase()==='KEHOACH');
+  if(kh.length){
+    h+='<div class="secnote"><b>Kế hoạch bổ sung bạn nhập</b> (ngoài lịch content)</div><div class="bullets">'
+      +kh.map(o=>'<div class="b"><span class="ic">•</span><div><b>'+esc(o.nd)+'</b>'+(o.ghi?' — <span class="small">'+esc(o.ghi)+'</span>':'')+'</div></div>').join('')+'</div>';
+  }
+  h+=secTitle('趨勢','Trend Tuần Này',0,'trend gì đang hot · mình xử lý thế nào · LOAI = TREND');
+  const tr=nxAll.filter(o=>cl(o.loai).toUpperCase()==='TREND');
+  h+= tr.length
+    ? '<div class="bullets">'+tr.map(o=>'<div class="b"><span class="ic">•</span><div><b>'+esc(o.nd)+'</b>'+(o.ghi?' — <span class="small">'+esc(o.ghi)+'</span>':'')+'</div></div>').join('')+'</div>'
+    : emptyMsg('Chưa ghi trend (LOAI = TREND).');
+  return h;
+}
+function contentBlock(a,b,emptyText){
+  if(CONTENT_ERR) return emptyMsg('Không đọc được Sheet lịch content — kiểm tra Sheet còn công khai không.');
+  if(CONTENT===null) return emptyMsg('Đang tải lịch content…');
+  const P=s=>cl(s).toUpperCase();
+  const fy=a.getFullYear();
+  const pd=s=>{ const m=cl(s).match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/); return m?new Date(+(m[3]||fy),+m[2]-1,+m[1]):null; };
+  /* hiện NGUYÊN THÁNG chứa kỳ đang xem; kỳ đang xem tô be, tuần kế tiếp tô vàng */
+  const mA=new Date(a.getFullYear(),a.getMonth(),1), mB=new Date(b.getFullYear(),b.getMonth()+1,0);
+  const nxA=addD(b,1), nxB=addD(b,7);
+  const dOf=r=>pd(r[7])||pd(r[6])||pd(r[5]);
+  const rows=CONTENT.filter(r=>{
+    if(P(r[12]).includes('HỦY')) return false;
+    const d=dOf(r); return inR(d,mA,mB)||inR(d,nxA,nxB);
+  });
+  if(!rows.length) return emptyMsg(emptyText);
+  const cur=rows.filter(r=>inR(dOf(r),a,b));
+  const aired=cur.filter(r=>P(r[11])==='DONE'||P(r[12])==='AIR').length;
+  const editing2=cur.filter(r=>P(r[11]).includes('EDIT')).length;
+  const late=cur.filter(r=>P(r[11]).includes('TRỄ')).length;
+  const notyet=cur.filter(r=>P(r[11]).includes('CHƯA')).length;
+  let h='<div class="pipestats"><div class="pipestat"><b>'+cur.length+'</b><span>video kỳ này</span></div>'
+    +'<div class="pipestat"><b>'+aired+'</b><span>đã đăng (air)</span></div>'
+    +'<div class="pipestat"><b>'+editing2+'</b><span>đang edit</span></div>'
+    +'<div class="pipestat"><b>'+late+'</b><span>trễ deadline</span></div>'
+    +'<div class="pipestat"><b>'+notyet+'</b><span>chưa bắt đầu</span></div></div>';
+  h+='<div class="secnote"><span style="background:#F3E4CF;padding:2px 8px;border-radius:6px">nền be = kỳ đang xem ('+ddmm(a)+' – '+ddmm(b)+')</span> · <span style="background:#FFF1BF;padding:2px 8px;border-radius:6px">nền vàng = tuần kế tiếp ('+ddmm(nxA)+' – '+ddmm(nxB)+')</span> · còn lại = các tuần khác trong tháng</div>';
+  const badge=t=>{ const u=P(t);
+    if(u==='DONE') return '<span class="st dadang">Done</span>';
+    if(u.includes('EDIT')) return '<span class="st choedit">'+esc(t)+'</span>';
+    if(u.includes('TRỄ')) return '<span class="st chuaquay">'+esc(t)+'</span>';
+    return '<span class="st ytuong">'+esc(t||'—')+'</span>'; };
+  h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>Video</th><th>Loại</th><th class="c">quay/dựng</th><th class="c">Tiến độ</th><th class="c">Duyệt</th></tr>'
+    +rows.slice().sort((x,y)=>(dOf(x)||mB)-(dOf(y)||mB))
+      .map(r=>{ const d=dOf(r); const cls=inR(d,a,b)?' class="hl1"':(inR(d,nxA,nxB)?' class="hl2"':'');
+        return '<tr'+cls+'><td class="c">'+(cl(r[7])?cl(r[7]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[1])+(cl(r[0])?' <span class="small">('+esc(r[0])+')</span>':'')+'</td><td class="small">'+esc(r[2]||'—')+'</td><td class="c small">'+(P(r[9])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[10])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(r[11])+'</td><td class="c small">'+esc(r[12]||'—')+'</td></tr>'; }).join('')+'</table></div>';
+  return h;
+}
+
+/* ── ③ DỰ ÁN ── */
 const PROJ_GROUPS={
-  VIETTHEM:['✍️','本週新寫 Kịch bản viết thêm tuần này'],
-  DUYET:   ['📩','審核 Gửi duyệt'],
-  DIENVIEN:['🎭','演員 Đưa diễn viên'],
-  DAQUAY:  ['✅','已拍 Tập đã quay'],
-  CHUAQUAY:['📝','未拍 Tập chưa quay'],
-  KHOKHAN: ['⚠️','困難 Khó khăn đang gặp'],
-  BUOCTIEP:['➡️','下一步 Bước tiếp theo']};
+  KICHBAN:'劇本 Kịch bản',
+  VIETTHEM:'本週新寫 Kịch bản viết thêm',
+  DUYET:'審核 Gửi duyệt',
+  DIENVIEN:'演員 Đưa diễn viên',
+  DAQUAY:'已拍 Đã quay',
+  HOANCHINH:'完成 Video hoàn chỉnh',
+  CHUAQUAY:'未拍 Chưa quay',
+  KHOKHAN:'困難 Khó khăn',
+  BUOCTIEP:'下一步 Bước tiếp theo',
+  NHANXET:'評估 Nhận xét',
+  KEHOACH:'下週計畫 Kế hoạch tuần sau',
+  GHICHU:'備註 Ghi chú'};
+function renderS3(){
+  let h=secTitle('專案追蹤','Dự Án Riêng',0,'chọn dự án trong ô dưới mới hiện chi tiết · hai team hiển thị song song để so sánh');
+  const projs=[...new Set(DB.duan.map(o=>o.duAn).filter(Boolean))];
+  if(!projs.length) return h+emptyMsg('Chưa có dự án nào trong Sheet DUAN.');
+  h+='<div class="projbox"><select id="projSel" onchange="showProj(this.value)"><option value="">— 選擇專案 Chọn dự án để xem —</option>'
+    +projs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('')+'</select><div id="projBody"></div></div>';
+  return h;
+}
+const TEAM_LABEL=t=>{ const u=cl(t).toUpperCase(); if(u==='GENZ')return'Team GENZ'; if(u==='THANHBINH')return'Team THANH BÌNH'; return u?'Team '+cl(t):''; };
+function teamBlock(rows,titleHtml){
+  const get=k=>rows.filter(o=>cl(o.muc).toUpperCase()===k).map(o=>o.nd);
+  const tiendo=get('TIENDO')[0]||'';
+  const mm=tiendo.match(/(\d+)\s*\/\s*(\d+)/); const pc=mm?Math.round(+mm[1]/+mm[2]*100):null;
+  const list=(title,arr)=>arr.length?'<div class="projcell"><h4>'+title+'</h4><ul>'+arr.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>':'';
+  let h=titleHtml;
+  h+='<div class="projgrid">';
+  if(tiendo) h+='<div class="projcell full"><h4>進度 Tiến độ</h4><div style="font-size:15px;font-weight:700;color:var(--brown)">'+esc(tiendo)+'</div>'
+    +(pc!==null?'<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:4px">'+pc+'% hoàn thành</div>':'')+'</div>';
+  for(const k in PROJ_GROUPS) h+=list(PROJ_GROUPS[k],get(k));
+  const known=['TIENDO'].concat(Object.keys(PROJ_GROUPS));
+  [...new Set(rows.map(o=>cl(o.muc).toUpperCase()).filter(k=>k&&!known.includes(k)))].forEach(k=>{h+=list(esc(k),get(k));});
+  h+='</div>';
+  return h;
+}
 function showProj(name){
   const box=document.getElementById('projBody');
   window.__projKeep=name||null;
   if(!name){ box.innerHTML=''; return; }
-  const all=(window.__duan||[]).filter(r=>r[2]===name), code=window.__duanCode;
-  const rows=all.filter(r=>r[1]===code);
-  const get=k=>rows.filter(r=>r[3].toUpperCase()===k).map(r=>r[4]);
-  const tiendo=get('TIENDO')[0]||'';
-  const mm=tiendo.match(/(\d+)\s*\/\s*(\d+)/); const pc=mm?Math.round(+mm[1]/+mm[2]*100):null;
-  const list=(title,ic,arr)=> arr.length?'<div class="projcell"><h4>'+title+'</h4><ul>'
-    +arr.map(x=>'<li>'+ic+' '+esc(x)+'</li>').join('')+'</ul></div>':'';
+  const all=DB.duan.filter(o=>o.duAn===name);
+  const rows=all.filter(o=>inR(o.d,RA,RB));
   let h='';
-  if(!rows.length)
-    h+='<div class="empty">Tuần này chưa nhập dữ liệu cho dự án này — xem lịch sử các tuần bên dưới.</div>';
+  if(!rows.length) h+=emptyMsg('Kỳ đang xem chưa có ghi chép cho dự án này — chọn tuần khác trên lịch để xem lại các kỳ trước.');
   else{
-    h+='<div class="projgrid">'
-      +'<div class="projcell full"><h4>進度 Tiến độ kịch bản</h4><div style="font-size:15px;font-weight:700;color:var(--brown)">'+esc(tiendo||'—')+'</div>'
-      +(pc!==null?'<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:4px">'+pc+'% hoàn thành</div>':'')+'</div>';
-    for(const k in PROJ_GROUPS) h+=list(PROJ_GROUPS[k][1],PROJ_GROUPS[k][0],get(k));
-    const known=['TIENDO'].concat(Object.keys(PROJ_GROUPS));
-    [...new Set(rows.map(r=>r[3].toUpperCase()).filter(k=>k&&!known.includes(k)))]
-      .forEach(k=>{ h+=list(esc(k),'📌',get(k)); });
-    h+='</div>';
-  }
-  /* lịch sử các tuần khác của dự án này — bấm là nhảy sang tuần đó, vẫn giữ dự án đang chọn */
-  const hist=WEEKS.filter(w=>w.code!==code && all.some(r=>r[1]===w.code));
-  if(hist.length){
-    h+='<div class="projcell full" style="margin-top:10px"><h4>歷史 Lịch sử các tuần</h4><div class="tblwrap"><table>'
-      +'<tr><th>Tuần</th><th>Tiến độ ghi nhận</th><th class="c"></th></tr>'
-      +hist.slice().reverse().map(w=>{
-        const t=all.find(r=>r[1]===w.code && r[3].toUpperCase()==='TIENDO');
-        const n=all.filter(r=>r[1]===w.code).length;
-        return '<tr><td class="vidname">Tuần '+w.w+' T'+w.m+' <span class="small">('+esc(w.range||'')+')</span></td>'
-          +'<td class="small">'+esc(t?t[4]:('('+n+' dòng dữ liệu)'))+'</td>'
-          +'<td class="c"><button class="chip wk" onclick="pickWeek(\''+w.code+'\')">Xem tuần này →</button></td></tr>';
-      }).join('')+'</table></div></div>';
+    const named=[...new Set(rows.filter(o=>cl(o.team)).map(o=>cl(o.team).toUpperCase()))].sort();
+    const chung=rows.filter(o=>!cl(o.team));
+    if(named.length){
+      /* danh sách MỤC chung cho mọi team — đánh số giống nhau để so sánh trái phải */
+      const order=['TIENDO'].concat(Object.keys(PROJ_GROUPS));
+      const used=[...new Set(rows.filter(o=>cl(o.team)).map(o=>cl(o.muc).toUpperCase()))];
+      const fields=order.filter(k=>used.includes(k)).concat(used.filter(k=>!order.includes(k)));
+      h+='<div class="teamwrap">'+named.map(t=>{
+        const trs=rows.filter(o=>cl(o.team).toUpperCase()===t);
+        const get=k=>trs.filter(o=>cl(o.muc).toUpperCase()===k).map(o=>o.nd);
+        let c='<div class="teamcard"><div class="tname">'+esc(TEAM_LABEL(t))+'</div>';
+        fields.forEach((k,i)=>{
+          const g=PROJ_GROUPS[k]; const vals=get(k);
+          const lbl=k==='TIENDO'?'進度 Tiến độ':(g||k);
+          const em=(k==='NHANXET'||k==='KEHOACH')?' em':'';
+          c+='<div class="trow'+em+'"><span class="no">'+(i+1)+'.</span><span class="tl">'+esc(lbl)+'</span>';
+          if(!vals.length) c+='<ul><li class="small">—</li></ul>';
+          else{
+            c+='<ul>'+vals.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+            if(k==='TIENDO'){ const mm=vals[0].match(/(\d+)\s*\/\s*(\d+)/);
+              if(mm){ const pc=Math.round(+mm[1]/+mm[2]*100);
+                c+='<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:3px">'+pc+'% hoàn thành</div>'; } }
+          }
+          c+='</div>';
+        });
+        return c+'</div>';
+      }).join('')+'</div>';
+    }
+    if(chung.length) h+=teamBlock(chung,'<div class="secnote" style="margin-top:10px;font-size:13px"><b>Chung cả dự án</b></div>');
   }
   box.innerHTML=h;
 }
 
-/* ═══ CHẾ ĐỘ SỬA TRANG (lưu trên máy này, theo từng tuần) ═══ */
-let editing=false, saveTimer=null;
+/* ═══════════ SỬA TRANG ═══════════ */
 function toggleEdit(){
   editing=!editing;
   document.getElementById('editBtn').classList.toggle('active',editing);
-  document.getElementById('editBtn').textContent=editing?'💾 Xong — đang lưu tự động':'✏️ Sửa trang';
-  if(editing) enableEdit(); else { disableEdit(); renderWeek(CUR); }
+  document.getElementById('editBtn').textContent=editing?'Xong — đang lưu tự động':'Sửa trang';
+  if(editing) enableEdit(); else { disableEdit(); render(); }
 }
-function enableEdit(){
-  const app=document.getElementById('app');
-  app.setAttribute('contenteditable','true');
-  app.addEventListener('input',onEdit);
-}
-function onEdit(){
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    const app=document.getElementById('app');
-    localStorage.setItem('loho2_edit_'+CUR, app.innerHTML);
-  },400);
-}
-function disableEdit(){
-  const app=document.getElementById('app');
-  app.removeAttribute('contenteditable');
-  app.removeEventListener('input',onEdit);
-}
-function resetEdit(){ localStorage.removeItem('loho2_edit_'+CUR); renderWeek(CUR); }
-
-/* ═══ SỐ LIỆU MẪU (tuần 27/07–02/08/2026 thật của kênh) — hiện khi Sheet chưa có cấu trúc mới ═══ */
-const DEMO_CSV=`LOAI,TUAN,C,D,E,F,G,H,I,J,K
-META,2026-07-5,27/07 – 02/08/2026,04/08/2026 12:30
-KPI,2026-07-5,97017000,554,71700,5,88
-GMVVIDEO,2026-07-5,Series Cải tạo phòng họp | Tập 7,5000000,ORG,Video cũ 3 tháng vẫn kéo tiền tốt nhất kênh
-GMVVIDEO,2026-07-5,Sơn tường Loho House - Chất có mịn không,4000000,ORG,Ổn định nhiều tuần liền
-GMVVIDEO,2026-07-5,Tính m² sàn - nhiều người vẫn nhầm,2800000,ADS,Có chạy quảng cáo — cần xem lại hiệu quả
-GMVVIDEO,2026-07-5,Màu sơn nội thất bán chạy nhất LOHO,2300000,ORG,
-GMVVIDEO,2026-07-5,Màng nilong chắn sơn chắn bụi,2280000,ORG,Video trả lời comment — chuyển đổi tốt
-GMVVIDEO,2026-07-5,Tự cải tạo phòng dễ lắm để LoHo chỉ cho,2200000,ORG,
-GMVVIDEO,2026-07-5,Biến sàn gạch trơn thành bám chân 10 phút,1300000,ADS,GMV thấp so với tiền ads — cân nhắc tắt
-VIDEO,2026-07-5,3 điều nhân viên hãng sơn không bao giờ nói với bạn,Hướng dẫn,27/07,1611,24,1,,,Tốt — dẫn đầu tuần với 38% tổng view video mới
-VIDEO,2026-07-5,Băng keo nilong,Sản phẩm,29/07,793,7,,,,Thường — view ổn nhưng tương tác thấp
-VIDEO,2026-07-5,Top 5 màu bán chạy nhất nhà LOHO,Sản phẩm,30/07,668,5,,,,Thường
-VIDEO,2026-07-5,Cái góc này xấu nhất công ty,Sản phẩm,31/07,669,6,,,,Thường — hook chưa đủ mạnh
-VIDEO,2026-07-5,Một ngày làm việc tại Loho House,Đời sống,02/08,460,8,,,,Yếu view nhưng like tốt — dạng đời sống nên đăng giờ khuya
-CLIP,2026-07-5,Tập «Bác sĩ ca mổ tường»,DADANG,Đăng 27/07
-CLIP,2026-07-5,Tập «Đầu bếp fine dining»,CHOEDIT,Đã quay 01/08 — deadline edit 05/08
-CLIP,2026-07-5,Tập «HLV bóng đá sơn nhầm nhà»,CHUAQUAY,Kịch bản đã chốt — quay buổi thứ 7 tuần này
-CLIP,2026-07-5,Clip sale sơn 99K theo trend mới,YTUONG,Chờ chốt trend tuần
-QUAYSAU,2026-07-5,Thứ 7 09/08,7,Quay gom 1 buổi — 2 diễn viên C Thảo + C Thúy
-SANPHAM,2026-07-5,COMBO 5m² (36 tấm) Sàn Nhựa Giả Gỗ Dán Keo,225,114500000
-SANPHAM,2026-07-5,Băng keo nilon chắn sơn chắn bụi,461,15500000
-SANPHAM,2026-07-5,Sơn tường tone màu be,150,14400000
-NHANXET,2026-07-5,TOT,Chất lượng video mới tăng gần gấp đôi — like trung bình nhảy từ 5.5 lên 10 mỗi video
-NHANXET,2026-07-5,TOT,FYP đạt 37.8% vượt mục tiêu 35% — kênh bớt phụ thuộc tìm kiếm
-NHANXET,2026-07-5,CHUA,Không video mới nào lọt bảng doanh thu — GMV vẫn dựa hoàn toàn vào kho content cũ
-NHANXET,2026-07-5,CHUA,Lượt chia sẻ giảm 30% và xem hồ sơ giảm 20.9% — người xem đông nhưng không giữ chân được
-KEHOACH,2026-07-5,Series Cải tạo phòng họp | Tập 8,05/08,Combo lót+phủ 159K
-KEHOACH,2026-07-5,Tập «Đầu bếp fine dining» (series bệnh nghề nghiệp),06/08,
-KEHOACH,2026-07-5,Clip bán hàng sơn đồng giá 99K,07/08,Sơn 99K/lon 1kg
-KEHOACH,2026-07-5,Clip trend tuần (chốt sau khi dò trend),08/08,Đơn 399K tặng 6 món công cụ
-TREND,2026-07-5,Trend cầm bảng chạy quảng cáo,DAQUAY,Đã lồng vào clip sale — chờ số liệu
-TREND,2026-07-5,Trend «thiếu ngủ làm lộn việc» kiểu Bông Tím,KICHBAN,Hợp vibe hài của kênh — đang viết kịch bản
-TREND,2026-07-5,Trend nhạc mới tuần,BOQUA,Không hợp ngành sơn — bỏ
-DUAN,2026-07-5,Bệnh nghề nghiệp,TIENDO,Đã chốt 16/16 kịch bản series
-DUAN,2026-07-5,Bệnh nghề nghiệp,VIETTHEM,Viết thêm 2 kịch bản tuần này (tập 15 + 16)
-DUAN,2026-07-5,Bệnh nghề nghiệp,DUYET,Đã gửi sếp duyệt tập 15-16 ngày 01/08 — chờ phản hồi
-DUAN,2026-07-5,Bệnh nghề nghiệp,DIENVIEN,Đã gửi kịch bản tập 15 cho C Thảo + C Thúy · tập 16 chưa gửi
-DUAN,2026-07-5,Bệnh nghề nghiệp,DAQUAY,Tập 13 «Bác sĩ ca mổ tường» — đã đăng
-DUAN,2026-07-5,Bệnh nghề nghiệp,DAQUAY,Tập 14 «Đầu bếp fine dining» — quay xong chờ edit
-DUAN,2026-07-5,Bệnh nghề nghiệp,CHUAQUAY,Tập 15 «HLV bóng đá» + Tập 16 «MC đám cưới»
-DUAN,2026-07-5,Bệnh nghề nghiệp,KHOKHAN,Đạo cụ công ty hỗ trợ phải thu hồi sau quay — cần lên danh sách mượn/trả trước buổi quay
-DUAN,2026-07-5,Bệnh nghề nghiệp,KHOKHAN,Lịch 2 diễn viên chỉ rảnh thứ 7 — dồn 7 clip 1 buổi dễ cháy giờ
-DUAN,2026-07-5,Bệnh nghề nghiệp,BUOCTIEP,Quay tập 15-16 buổi thứ 7 09/08 · xác nhận kỹ thuật cân sơn với nhân viên cũ trước khi quay`;
+function enableEdit(){ const a=document.getElementById('app'); a.setAttribute('contenteditable','true'); a.addEventListener('input',onEdit); }
+function onEdit(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ localStorage.setItem('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB), document.getElementById('app').innerHTML); },400); }
+function disableEdit(){ const a=document.getElementById('app'); a.removeAttribute('contenteditable'); a.removeEventListener('input',onEdit); }
+function resetEdit(){ localStorage.removeItem('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB)); render(); }
 
 load();
 </script>
