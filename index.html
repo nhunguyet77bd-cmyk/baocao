@@ -554,11 +554,13 @@ function renderS1(){
   const folS=sum(tq,'fol'); if(folS) auto.push({g:folS>0,t:'Follower '+(folS>0?'tăng ròng +':'giảm ')+fmtN(Math.abs(folS))+' trong kỳ'});
   const nxAll=rowsIn(DB.nx);
   const good=nxAll.filter(o=>cl(o.loai).toUpperCase()==='TOT'), bad=nxAll.filter(o=>cl(o.loai).toUpperCase()==='CHUA');
-  if(auto.length||good.length||bad.length){
+  /* gom nhóm: toàn bộ TỐT trước, rồi mới tới CHƯA */
+  const listTot=auto.filter(o=>o.g).map(o=>o.t).concat(good.map(o=>o.nd));
+  const listChua=auto.filter(o=>!o.g).map(o=>o.t).concat(bad.map(o=>o.nd));
+  if(listTot.length||listChua.length){
     h+='<div class="bullets">'
-      +auto.map(o=>'<div class="b"><span class="ic"><span class="tag '+(o.g?'org">TỐT':'ads">CHƯA')+'</span></span><div>'+esc(o.t)+'</div></div>').join('')
-      +good.map(o=>'<div class="b"><span class="ic"><span class="tag org">TỐT</span></span><div>'+esc(o.nd)+'</div></div>').join('')
-      +bad.map(o=>'<div class="b"><span class="ic"><span class="tag ads">CHƯA</span></span><div>'+esc(o.nd)+'</div></div>').join('')+'</div>';
+      +listTot.map(t=>'<div class="b"><span class="ic"><span class="tag org">TỐT</span></span><div>'+esc(t)+'</div></div>').join('')
+      +listChua.map(t=>'<div class="b"><span class="ic"><span class="tag ads">CHƯA</span></span><div>'+esc(t)+'</div></div>').join('')+'</div>';
   } else h+=emptyMsg('Chưa đủ số liệu để phân tích.');
   return h;
 }
