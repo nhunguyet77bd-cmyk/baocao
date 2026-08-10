@@ -73,6 +73,17 @@ main{max-width:960px;margin:0 auto;padding:18px 14px 60px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
 .card h4{font-size:12px;color:var(--text2);font-weight:700;margin-bottom:8px}
+/* thanh ngang % (traffic / nhân khẩu) */
+.hrow{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px}
+.hrow .hl{flex:0 0 110px}
+.hrow .hv{flex:0 0 46px;text-align:right;font-weight:700;color:var(--brown)}
+.hbar{flex:1;height:8px;background:#F1EAE0;border-radius:5px;overflow:hidden}
+.hbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#a97e50);border-radius:5px}
+/* thẻ mục tiêu */
+.goal{background:linear-gradient(120deg,#FBF3DC,#FFF8EC);border:1.5px solid var(--gold);border-radius:14px;padding:14px 16px;margin:14px 0}
+.goal .gt{font-weight:800;color:var(--gold);font-size:14px}
+.goal ul{list-style:none;margin-top:8px}
+.goal li{font-size:12.5px;padding:3px 0}
 /* donut */
 .donutrow{display:flex;align-items:center;gap:16px}
 .donut{width:110px;height:110px;border-radius:50%;flex:0 0 auto;position:relative}
@@ -191,7 +202,7 @@ const tabUrl = g => 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?
 /* ═══════════ TIỆN ÍCH ═══════════ */
 const cl = s => (s==null?'':String(s)).trim();
 const esc = s => cl(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const num = s => { const n=parseFloat(cl(s).replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; };
+const num = s => { s=cl(s).replace(/\s/g,''); if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,''); if(/^\d+,\d+$/.test(s)) s=s.replace(',','.'); const n=parseFloat(s.replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; };
 const fmtN = n => n===''||n==null||isNaN(n) ? '—' : Number(n).toLocaleString('vi-VN');
 const fmtMoney = n => { n=Number(n)||0; if(n>=1e9) return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ'; if(n>=1e6) return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+'tr'; return n?Math.round(n).toLocaleString('vi-VN')+'đ':'—'; };
 function dmy(s){ const m=cl(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(!m) return null; return new Date(+m[3],+m[2]-1,+m[1]); }
@@ -216,7 +227,9 @@ function parseCSV(text){
 
 /* ═══════════ TRẠNG THÁI ═══════════ */
 const DB = { tq:[], vid:[], duan:[], nx:[] };
-let CONTENT=null, CONTENT_ERR=false;
+let CONTENT=null, CONTENT_ERR=false, CONTENT_ADS_COL=-1;
+/* vị trí cột trong lịch content — dò lại theo tiêu đề mỗi lần tải */
+let CI={ma:0,ten:1,loai:2,lichquay:5,deadline:6,air:7,quay:9,dung:10,ads:-1,tiendo:11,duyet:12};
 let DEMOTABS=[];             // tab đang dùng số liệu mẫu
 let RA=null, RB=null;        // khoảng ngày đang xem
 let CURMONTH=null, CURYEAR=null;
@@ -271,6 +284,15 @@ nx:`NGAY,LOAI,NOI_DUNG,GHI_CHU,SO_MON,GMV
 02/08/2026,TREND,[HÀI] Câu nói «Tôi tưởng ai cũng có chứ ta»,Đề xuất skit: khách khoe sàn LOHO «tôi tưởng nhà ai cũng có chứ ta» — dễ lồng bán hàng · hợp Thảo/Thúy,,
 02/08/2026,TREND,[HÀI] Câu «Ai sợ thì đi về» (MCK),Đề xuất skit: khách sợ tự sơn hỏng — «ai sợ thì đi về · ở lại LOHO chỉ cho» · hợp format hài công sở,,
 02/08/2026,TREND,[HÀI] «Hên lắm mới xui được như vậy»,Đề xuất: tình huống sơn nhầm màu/lỗi thi công rồi chữa cháy bằng sản phẩm LOHO,,
+02/08/2026,TRAFFIC,Tìm kiếm,,53,
+02/08/2026,TRAFFIC,Đề xuất (FYP),,40.6,
+02/08/2026,TRAFFIC,Hồ sơ cá nhân,,6.2,
+02/08/2026,TRAFFIC,Đã follow,,0.2,
+02/08/2026,NHANKHAU,Nữ giới,,64,
+02/08/2026,NHANKHAU,Nam giới,,36,
+02/08/2026,NHANKHAU,Tuổi 25–34,,41.6,
+02/08/2026,NHANKHAU,Việt Nam,,83.5,
+02/08/2026,MUCTIEU,Sàn TikTok Shop: cấp 5 → mục tiêu cấp 6,Điều kiện lên cấp xem trong Seller Center → Cấp độ người bán · chép vào đây hoặc chụp màn hình gửi Claude điền giùm,,
 02/08/2026,SANPHAM,COMBO 5m² (36 tấm) Sàn Nhựa Giả Gỗ Dán Keo,,225,114500000
 02/08/2026,SANPHAM,Băng keo nilon chắn sơn chắn bụi,,461,15500000
 02/08/2026,SANPHAM,Sơn tường tone màu be,,150,14400000
@@ -295,7 +317,7 @@ function rowsToObjs(rows, map, reqKeys){
 }
 const MAPS = {
   tq:  {gmv:{i:1,n:1},ads:{i:2,n:1},chi:{i:3,n:1},don:{i:4,n:1},xem:{i:5,n:1},fol:{i:6,n:1},note:{i:7}},
-  vid: {ten:{i:1},dang:{i:2},loai:{i:3},nguon:{i:4},gmv:{i:5,n:1},don:{i:6,n:1},xem:{i:7,n:1},tim:{i:8,n:1},bl:{i:9,n:1},cs:{i:10,n:1},luu:{i:11,n:1},dg:{i:12}},
+  vid: {ten:{i:1},dang:{i:2},loai:{i:3},nguon:{i:4},gmv:{i:5,n:1},don:{i:6,n:1},xem:{i:7,n:1},tim:{i:8,n:1},bl:{i:9,n:1},cs:{i:10,n:1},luu:{i:11,n:1},dg:{i:12},chiAds:{i:13,n:1}},
   nx:  {loai:{i:1},nd:{i:2},ghi:{i:3},mon:{i:4,n:1},gmv:{i:5,n:1}}
 };
 /* DUAN dạng 2 cột song song: NGAY | DU_AN | MUC | GENZ | THANHBINH | CHUNG — mỗi dòng tách thành tối đa 3 bản ghi */
@@ -328,7 +350,16 @@ async function loadContent(){
     if(!r.ok) throw 0;
     const t=await r.text();
     if(t.trim().startsWith('<')) throw 0;
-    CONTENT=parseCSV(t).slice(1).filter(x=>cl(x[1]));
+    const all2=parseCSV(t);
+    /* dò vị trí cột theo TÊN TIÊU ĐỀ — team thêm/bớt cột trong lịch content thì trang vẫn đúng */
+    const hd=(all2[0]||[]).map(x=>cl(x).toLowerCase());
+    const find=(re,fb)=>{ const i=hd.findIndex(h=>re.test(h)); return i>=0?i:fb; };
+    CI={ ma:find(/^mã|mã video/,0), ten:find(/title|tiêu đề|tên video/,1), loai:find(/loại/,2),
+         lichquay:find(/lịch quay/,5), deadline:find(/deadline/,6), air:find(/ngày air|ngày đăng/,7),
+         quay:find(/^đã quay/,9), dung:find(/^đã dựng/,10), ads:find(/ads|quảng cáo/,-1),
+         tiendo:find(/tiến độ/,11), duyet:find(/trạng thái/,12) };
+    CONTENT_ADS_COL=CI.ads;
+    CONTENT=all2.slice(1).filter(x=>cl(x[CI.ten]));
   }catch(e){ CONTENT_ERR=true; }
   if(RA) render();
 }
@@ -491,6 +522,15 @@ function renderS1(){
     +kpi('影片數','Video mới đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
     +kpi('粉絲','Follower tăng ròng',(sum(tq,'fol')>0?'+':'')+fmtN(sum(tq,'fol')||null),pctBadge(sum(tq,'fol'),tqP.length?sum(tqP,'fol'):null))
     +'</div>';
+  /* 🎯 mục tiêu cấp sàn — lấy dòng MUCTIEU mới nhất (không giới hạn kỳ) */
+  const mts=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='MUCTIEU'&&o.d<=RB).sort((a,b)=>b.d-a.d);
+  if(mts.length){
+    const mt=mts[0];
+    h+='<div class="goal"><div class="gt">🎯 MỤC TIÊU · '+esc(mt.nd)+'</div>';
+    if(cl(mt.ghi)) h+='<ul>'+cl(mt.ghi).split('·').map(x=>'<li>• '+esc(x.trim())+'</li>').join('')+'</ul>';
+    if(mt.mon!=null&&mt.mon>0) h+='<div class="progressbig" style="margin-top:8px"><i style="width:'+Math.min(100,mt.mon)+'%"></i></div><div class="small" style="margin-top:3px">'+mt.mon+'% tiến độ</div>';
+    h+='</div>';
+  }
   /* donut ads vs organic + hiệu quả ads/đơn */
   const pAds=gmv?Math.round(ads/gmv*100):0;
   const chi=sum(tq,'chi'), don=sum(tq,'don');
@@ -514,31 +554,59 @@ function renderS1(){
   h+='<div class="card" style="margin:12px 0"><h4>柱狀圖 GMV video theo ngày</h4><div class="chart">'
     +byDay.map(o=>'<div class="bar" style="height:'+Math.max(2,o.v/mx*100)+'%">'+(byDay.length<=10&&o.v?'<b class="v">'+fmtMoney(o.v)+'</b>':'')+'<span class="tip">'+ddmm(o.d)+' · '+fmtMoney(o.v)+'</span></div>').join('')
     +'</div><div class="xlabs">'+byDay.map((o,i)=>'<span>'+(days.length>14?(i%Math.ceil(days.length/10)===0?ddmm(o.d):''):ddmm(o.d))+'</span>').join('')+'</div></div>';
-  /* top 5 video doanh thu */
+  /* nguồn truy cập + nhân khẩu học (Sheet NHANXET · LOAI = TRAFFIC / NHANKHAU · SO_MON = %) */
+  const barRow=o=>'<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>'+esc(o.nd)+'</span><b>'+(o.mon!=null?o.mon.toLocaleString('vi-VN',{maximumFractionDigits:1})+'%':'—')+'</b></div><div style="height:7px;background:#F1EAE0;border-radius:5px;margin-top:3px"><div style="height:100%;width:'+Math.min(100,o.mon||0)+'%;background:var(--accent);border-radius:5px"></div></div></div>';
+  const trf=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='TRAFFIC');
+  const nk=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='NHANKHAU');
+  if(trf.length||nk.length){
+    h+='<div class="grid2">';
+    h+='<div class="card"><h4>流量來源 Nguồn Lưu Lượng Truy Cập</h4>'+(trf.length?trf.map(barRow).join(''):'<div class="small">Chưa nhập (LOAI = TRAFFIC)</div>')+'</div>';
+    h+='<div class="card"><h4>受眾 Nhân Khẩu Học Người Xem</h4>'+(nk.length?nk.map(barRow).join(''):'<div class="small">Chưa nhập (LOAI = NHANKHAU)</div>')+'</div>';
+    h+='</div>';
+  }
+  /* ── 1 · TOP 5 VIDEO XEM NHIỀU NHẤT TRONG TUẦN ── */
   const medal=i=>i+1;
+  const topXem=vid.filter(v=>v.xem).sort((a,b)=>b.xem-a.xem).slice(0,5);
+  if(topXem.length){
+    h+='<div class="secnote"><b>1 · TOP 5 video được xem nhiều nhất trong tuần</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">View</th><th class="r">Tim</th><th class="r">Bình luận</th><th class="r">Chia sẻ</th></tr>'
+      +topXem.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtN(v.xem)+'</b></td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td></tr>').join('')+'</table></div>';
+  }
+  /* ── 2 · TOP 5 VIDEO TẠO DOANH THU ── */
   const top5G=vid.filter(v=>v.gmv).sort((a,b)=>b.gmv-a.gmv).slice(0,5);
   if(top5G.length){
-    h+='<div class="secnote"><b>TOP 5 video tạo doanh thu nhiều nhất</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">GMV</th><th class="r">View</th><th class="r">Tim</th></tr>'
-      +top5G.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td></tr>').join('')+'</table></div>';
+    h+='<div class="secnote"><b>2 · TOP 5 video tạo ra doanh thu</b> — số đơn, số tiền, view, nguồn</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">Số tiền (GMV)</th><th class="r">Số đơn</th><th class="r">View</th><th class="c">Chuyển đổi</th></tr>'
+      +top5G.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="c">'+(v.don&&v.xem?(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'%':'—')+'</td></tr>').join('')+'</table></div>';
   }
-  /* top 5 sản phẩm bán chạy + bán chậm */
+  /* ── 3 · CLIP ĐANG CHẠY QUẢNG CÁO — kèm đánh giá tiền ads vs doanh thu ── */
+  const adsV=vid.filter(v=>cl(v.nguon).toUpperCase().startsWith('A')).sort((a,b)=>(b.gmv||0)-(a.gmv||0));
+  if(adsV.length){
+    const gmvAds=sum(adsV,'gmv');
+    h+='<div class="secnote"><b>3 · Clip đang chạy quảng cáo trong kỳ</b> — xếp theo GMV, clip đầu chạy tốt nhất</div>';
+    if(chi) h+='<div class="bullets"><div class="b"><span class="ic">•</span><div>Tiền ads đã chi: <b>'+fmtMoney(chi)+'</b> · GMV từ clip ads: <b>'+fmtMoney(gmvAds)+'</b> → ROAS <b>'+(gmvAds/chi).toLocaleString('vi-VN',{maximumFractionDigits:1})+'x</b> '+(gmvAds/chi>=3?'<span class="tag org">HIỆU QUẢ</span>':'<span class="tag ads">THẤP — XEM LẠI</span>')+'</div></div></div>';
+    else h+='<div class="secnote">Điền CHI_PHI_ADS ở Sheet TONGQUAN để trang tự tính ROAS (tiền ads vs doanh thu).</div>';
+    const dgAds=(v,i)=>{ const conv=v.don&&v.xem?v.don/v.xem*100:null;
+      const rc=v.chiAds&&v.gmv?v.gmv/v.chiAds:null;
+      if(rc!==null){ if(rc<1.5) return '<span class="tag ads">ROAS '+rc.toLocaleString('vi-VN',{maximumFractionDigits:1})+'x — LỖ/THẤP, CÂN NHẮC TẮT</span>';
+        if(rc>=3) return '<span class="tag org">ROAS '+rc.toLocaleString('vi-VN',{maximumFractionDigits:1})+'x — HIỆU QUẢ, DUY TRÌ</span>';
+        return '<span class="tag gold">ROAS '+rc.toLocaleString('vi-VN',{maximumFractionDigits:1})+'x — THEO DÕI THÊM</span>'; }
+      if(i===0) return '<span class="tag org">CHẠY TỐT NHẤT — DUY TRÌ</span>';
+      if(conv!==null&&conv<0.5) return '<span class="tag ads">CHUYỂN ĐỔI THẤP — CÂN NHẮC TẮT</span>';
+      if(conv!==null&&conv>=1) return '<span class="tag org">CHUYỂN ĐỔI TỐT</span>';
+      return '<span class="tag gold">THEO DÕI THÊM</span>'; };
+    h+='<div class="tblwrap"><table><tr><th class="c">#</th><th>Clip</th><th class="r">Chi ads</th><th class="r">GMV</th><th class="r">Đơn</th><th class="r">View</th><th class="c">Chuyển đổi</th><th class="c">Đánh giá</th></tr>'
+      +adsV.map((v,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="r">'+(v.chiAds?fmtMoney(v.chiAds):'—')+'</td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="c">'+(v.don&&v.xem?(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'%':'—')+'</td><td class="c">'+dgAds(v,i)+'</td></tr>').join('')+'</table></div>';
+    if(!adsV.some(v=>v.chiAds)) h+='<div class="secnote">Muốn hiện tiền ads + ROAS từng clip: mở Sheet VIDEO, gõ tiêu đề <b>CHI_ADS</b> vào ô N1 (cột ngay sau DANH_GIA) rồi điền tiền ads vào cột đó cho các dòng clip ADS.</div>';
+  }
+  /* ── 4 & 5 · SẢN PHẨM BÁN CHẠY / BÁN CHẬM ── */
   const spAll=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='SANPHAM');
   const sp=spAll.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,5);
   if(sp.length){
-    h+='<div class="secnote"><b>TOP 5 sản phẩm bán chạy nhất từ video</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+    h+='<div class="secnote"><b>4 · TOP 5 sản phẩm bán chạy trong tuần</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
       +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
     const cham=spAll.slice().sort((a,b)=>((a.mon??a.gmv)||0)-((b.mon??b.gmv)||0)).slice(0,5);
-    h+='<div class="secnote"><b>TOP 5 sản phẩm bán chậm</b> — cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+    h+='<div class="secnote"><b>5 · TOP 5 sản phẩm bán chậm</b> — cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
       +cham.map((o,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
     if(spAll.length<=5) h+='<div class="secnote">Điền đủ danh sách sản phẩm vào Sheet NHANXET (LOAI = SANPHAM) thì hai bảng chạy/chậm mới tách rõ — hiện mới có '+spAll.length+' sản phẩm.</div>';
-  }
-  /* top 5 video xem nhiều nhất TOÀN KÊNH — lấy bản ghi mới nhất của từng video (không giới hạn kỳ đang xem) */
-  const latestByVid={};
-  DB.vid.filter(v=>v.xem&&v.d<=RB).forEach(v=>{ const k=cl(v.ten); if(!latestByVid[k]||v.d>latestByVid[k].d) latestByVid[k]=v; });
-  const top3X=Object.values(latestByVid).sort((a,b)=>b.xem-a.xem).slice(0,5);
-  if(top3X.length){
-    h+='<div class="secnote"><b>TOP 5 video được xem nhiều nhất toàn kênh</b> — theo số liệu mới nhất đã nhập, không giới hạn tuần</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="r">View</th><th class="r">Tim</th><th class="r">Bình luận</th><th class="r">Chia sẻ</th></tr>'
-      +top3X.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="r"><b>'+fmtN(v.xem)+'</b></td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td></tr>').join('')+'</table></div>';
   }
   /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
   h+=secTitle('評估','Nhận Xét Trong Kỳ',0,'trang tự phân tích từ số liệu — dòng TOT/CHUA trong Sheet (nếu có) hiện thêm bên dưới');
@@ -616,12 +684,12 @@ function renderS2(){
   else{
     const P2=s=>cl(s).toUpperCase(); const fy2=nxA2.getFullYear();
     const pd2=s=>{ const m=cl(s).match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/); return m?new Date(+(m[3]||fy2),+m[2]-1,+m[1]):null; };
-    const nwk=CONTENT.filter(r=>!P2(r[12]).includes('HỦY')&&inR(pd2(r[7]),nxA2,nxB2))
-      .sort((a,b)=>pd2(a[7])-pd2(b[7]));
+    const nwk=CONTENT.filter(r=>!P2(r[CI.duyet]).includes('HỦY')&&inR(pd2(r[CI.air]),nxA2,nxB2))
+      .sort((a,b)=>pd2(a[CI.air])-pd2(b[CI.air]));
     if(nwk.length){
       h+='<div class="bullets"><div class="b"><span class="ic">•</span><div>Tuần tới dự kiến up <b>'+nwk.length+' video</b></div></div></div>';
       h+='<div class="tblwrap"><table><tr><th class="c">Ngày đăng</th><th>Video</th><th>Loại</th><th class="c">Tiến độ hiện tại</th><th class="c">Duyệt</th></tr>'
-        +nwk.map(r=>'<tr><td class="c">'+cl(r[7]).split('/').slice(0,2).join('/')+'</td><td class="vidname">'+esc(r[1])+(cl(r[0])?' <span class="small">('+esc(r[0])+')</span>':'')+'</td><td class="small">'+esc(r[2]||'—')+'</td><td class="c"><span class="st '+(P2(r[11])==='DONE'?'dadang">Done':(P2(r[11]).includes('EDIT')?'choedit">'+esc(r[11]):'ytuong">'+esc(r[11]||'—')))+'</span></td><td class="c small">'+esc(r[12]||'—')+'</td></tr>').join('')+'</table></div>';
+        +nwk.map(r=>'<tr><td class="c">'+cl(r[CI.air]).split('/').slice(0,2).join('/')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td><td class="c"><span class="st '+(P2(r[CI.tiendo])==='DONE'?'dadang">Done':(P2(r[CI.tiendo]).includes('EDIT')?'choedit">'+esc(r[CI.tiendo]):'ytuong">'+esc(r[CI.tiendo]||'—')))+'</span></td><td class="c small">'+esc(r[CI.duyet]||'—')+'</td></tr>').join('')+'</table></div>';
     } else h+=emptyMsg('Lịch content chưa có video nào cho tuần tới — cần lên lịch thêm.');
   }
   const kh=nxAll.filter(o=>cl(o.loai).toUpperCase()==='KEHOACH');
@@ -645,17 +713,17 @@ function contentBlock(a,b,emptyText){
   /* hiện NGUYÊN THÁNG chứa kỳ đang xem; kỳ đang xem tô be, tuần kế tiếp tô vàng */
   const mA=new Date(a.getFullYear(),a.getMonth(),1), mB=new Date(b.getFullYear(),b.getMonth()+1,0);
   const nxA=addD(b,1), nxB=addD(b,7);
-  const dOf=r=>pd(r[7])||pd(r[6])||pd(r[5]);
+  const dOf=r=>pd(r[CI.air])||pd(r[CI.deadline])||pd(r[CI.lichquay]);
   const rows=CONTENT.filter(r=>{
-    if(P(r[12]).includes('HỦY')) return false;
+    if(P(r[CI.duyet]).includes('HỦY')) return false;
     const d=dOf(r); return inR(d,mA,mB)||inR(d,nxA,nxB);
   });
   if(!rows.length) return emptyMsg(emptyText);
   const cur=rows.filter(r=>inR(dOf(r),a,b));
-  const aired=cur.filter(r=>P(r[11])==='DONE'||P(r[12])==='AIR').length;
-  const editing2=cur.filter(r=>P(r[11]).includes('EDIT')).length;
-  const late=cur.filter(r=>P(r[11]).includes('TRỄ')).length;
-  const notyet=cur.filter(r=>P(r[11]).includes('CHƯA')).length;
+  const aired=cur.filter(r=>P(r[CI.tiendo])==='DONE'||P(r[CI.duyet])==='AIR').length;
+  const editing2=cur.filter(r=>P(r[CI.tiendo]).includes('EDIT')).length;
+  const late=cur.filter(r=>P(r[CI.tiendo]).includes('TRỄ')).length;
+  const notyet=cur.filter(r=>P(r[CI.tiendo]).includes('CHƯA')).length;
   let h='<div class="pipestats"><div class="pipestat"><b>'+cur.length+'</b><span>video kỳ này</span></div>'
     +'<div class="pipestat"><b>'+aired+'</b><span>đã đăng (air)</span></div>'
     +'<div class="pipestat"><b>'+editing2+'</b><span>đang edit</span></div>'
@@ -667,10 +735,29 @@ function contentBlock(a,b,emptyText){
     if(u.includes('EDIT')) return '<span class="st choedit">'+esc(t)+'</span>';
     if(u.includes('TRỄ')) return '<span class="st chuaquay">'+esc(t)+'</span>';
     return '<span class="st ytuong">'+esc(t||'—')+'</span>'; };
-  h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>Video</th><th>Loại</th><th class="c">quay/dựng</th><th class="c">Tiến độ</th><th class="c">Duyệt</th></tr>'
+  /* cột Chạy ads: ưu tiên giá trị team ghi trong sheet content; chưa có thì trang tự gợi ý theo Loại clip */
+  const adsGoiY=loai=>{ const u=cl(loai).toUpperCase();
+    if(/HƯỚNG DẪN|EDUCATE|MẸO/.test(u)) return '<span class="tag org">RẤT HỢP</span>';
+    if(/SALE/.test(u)) return '<span class="tag org">HỢP — đẩy trước sale</span>';
+    if(/BÁN HÀNG|SẢN PHẨM|THƯƠNG MẠI|SERIES/.test(u)) return '<span class="tag org">HỢP</span>';
+    if(/GIẢI TRÍ|ĐỜI SỐNG|BRANDING/.test(u)) return '<span class="tag gold">TUỲ — có SP mới chạy</span>';
+    return '<span class="small">—</span>'; };
+  h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>Video</th><th>Loại</th><th class="c">quay/dựng</th><th class="c">Tiến độ</th><th class="c">Duyệt</th><th class="c">Chạy ads?</th></tr>'
     +rows.slice().sort((x,y)=>(dOf(x)||mB)-(dOf(y)||mB))
       .map(r=>{ const d=dOf(r); const cls=inR(d,a,b)?' class="hl1"':(inR(d,nxA,nxB)?' class="hl2"':'');
-        return '<tr'+cls+'><td class="c">'+(cl(r[7])?cl(r[7]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[1])+(cl(r[0])?' <span class="small">('+esc(r[0])+')</span>':'')+'</td><td class="small">'+esc(r[2]||'—')+'</td><td class="c small">'+(P(r[9])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[10])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(r[11])+'</td><td class="c small">'+esc(r[12]||'—')+'</td></tr>'; }).join('')+'</table></div>';
+        const userAds=CONTENT_ADS_COL>=0?cl(r[CONTENT_ADS_COL]):'';
+        const adsC='<td class="c">'+(userAds?'<span class="tag ads">'+esc(userAds)+'</span>':adsGoiY(r[CI.loai]))+'</td>';
+        return '<tr'+cls+'><td class="c">'+(cl(r[CI.air])?cl(r[CI.air]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td><td class="c small">'+(P(r[CI.quay])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[CI.dung])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(r[CI.tiendo])+'</td><td class="c small">'+esc(r[CI.duyet]||'—')+'</td>'+adsC+'</tr>'; }).join('')+'</table></div>';
+  h+='<div class="secnote">Cột «Chạy ads?» đang là gợi ý tự động theo loại clip — khi team thêm cột ads vào sheet lịch content thì giá trị team ghi (chữ đỏ) sẽ thay gợi ý.</div>';
+  /* cẩm nang: loại video nào chạy được quảng cáo TikTok */
+  h+='<div class="card" style="margin:10px 0"><h4>備忘 Cẩm Nang — Loại Video Nào Chạy Được Ads TikTok</h4><div class="tblwrap" style="border:none;margin:0"><table>'
+    +'<tr><th>Loại video</th><th class="c">Chạy ads?</th><th>Ghi chú</th></tr>'
+    +'<tr><td class="vidname">Hướng dẫn / mẹo (cách sơn, tính m²…)</td><td class="c"><span class="tag org">RẤT HỢP</span></td><td class="small">dạng ads hiệu quả nhất với ngành sơn/sàn — giữ chân người xem tốt, dễ gắn giỏ hàng</td></tr>'
+    +'<tr><td class="vidname">Thương mại / giới thiệu sản phẩm</td><td class="c"><span class="tag org">HỢP</span></td><td class="small">gắn sản phẩm trực tiếp — cần quay rõ công dụng, giá, tránh nói quá («bền vĩnh viễn», «tốt nhất thị trường» dễ bị từ chối duyệt)</td></tr>'
+    +'<tr><td class="vidname">Sale / khuyến mãi</td><td class="c"><span class="tag org">HỢP</span></td><td class="small">ghi rõ %, thời hạn thật — TikTok từ chối khuyến mãi mập mờ; nên đẩy ads 1-2 ngày trước sale</td></tr>'
+    +'<tr><td class="vidname">Giải trí / skit hài</td><td class="c"><span class="tag gold">TUỲ</span></td><td class="small">chạy được nếu sản phẩm xuất hiện tự nhiên trong clip; thuần giải trí thì để organic nuôi kênh, đừng tốn tiền ads</td></tr>'
+    +'<tr><td class="vidname">Lưu ý chung</td><td class="c">—</td><td class="small">video dùng nhạc thương mại được cấp phép (nhạc trend thường KHÔNG được dùng cho ads) · hình before/after quá lố dễ bị từ chối</td></tr>'
+    +'</table></div></div>';
   return h;
 }
 
