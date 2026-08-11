@@ -337,7 +337,7 @@ async function fetchTab(key,tab){
   const gid=GIDS[tab];
   if(gid===null||gid===undefined||gid===''){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
   try{
-    const r=await fetch(tabUrl(gid));
+    const r=await fetch(tabUrl(gid)+'&_cb='+Date.now(),{cache:'no-store'});
     if(!r.ok) throw 0;
     const t=await r.text();
     if(t.trim().startsWith('<')) throw 0;
@@ -346,7 +346,7 @@ async function fetchTab(key,tab){
 }
 async function loadContent(){
   try{
-    const r=await fetch(CONTENT_CSV_URL);
+    const r=await fetch(CONTENT_CSV_URL+'&_cb='+Date.now(),{cache:'no-store'});
     if(!r.ok) throw 0;
     const t=await r.text();
     if(t.trim().startsWith('<')) throw 0;
@@ -603,10 +603,13 @@ function renderS1(){
   if(sp.length){
     h+='<div class="secnote"><b>4 · TOP 5 sản phẩm bán chạy trong tuần</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
       +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
-    const cham=spAll.slice().sort((a,b)=>((a.mon??a.gmv)||0)-((b.mon??b.gmv)||0)).slice(0,5);
-    h+='<div class="secnote"><b>5 · TOP 5 sản phẩm bán chậm</b> — cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
-      +cham.map((o,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
-    if(spAll.length<=5) h+='<div class="secnote">Điền đủ danh sách sản phẩm vào Sheet NHANXET (LOAI = SANPHAM) thì hai bảng chạy/chậm mới tách rõ — hiện mới có '+spAll.length+' sản phẩm.</div>';
+    /* bán chậm = các sản phẩm NGOÀI top bán chạy — chỉ hiện khi có đủ hơn 5 sản phẩm, tránh cảnh sản phẩm số 1 lại nằm trong bảng «bán chậm» */
+    const conLai=spAll.filter(o=>!sp.includes(o));
+    if(conLai.length){
+      const cham=conLai.slice().sort((a,b)=>((a.mon??a.gmv)||0)-((b.mon??b.gmv)||0)).slice(0,5);
+      h+='<div class="secnote"><b>5 · Sản phẩm bán chậm</b> — ngoài nhóm bán chạy · cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+        +cham.map((o,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
+    } else h+='<div class="secnote">Chưa có bảng «bán chậm» — Sheet mới có '+spAll.length+' sản phẩm, tất cả đều nằm trong nhóm bán chạy. Điền thêm sản phẩm vào Sheet NHANXET (LOAI = SANPHAM) là bảng này tự hiện.</div>';
   }
   /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
   h+=secTitle('評估','Nhận Xét Trong Kỳ',0,'trang tự phân tích từ số liệu — dòng TOT/CHUA trong Sheet (nếu có) hiện thêm bên dưới');
@@ -665,7 +668,7 @@ function renderS2(){
   h+='<div class="secnote"><b>Video đăng trong kỳ</b> — cột đánh giá bỏ trống thì trang tự nhận xét</div>';
   h+= newV.length
     ? '<div class="tblwrap"><table><tr><th class="c">Ngày</th><th>Video</th><th>Loại</th><th class="r">View</th><th class="r">Tim</th><th class="r">BL</th><th class="r">Share</th><th class="r">Lưu</th><th>Đánh giá</th></tr>'
-      +newV.sort((a,b)=>(b.xem||0)-(a.xem||0)).map(v=>'<tr><td class="c">'+ddmm(v.dang)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="small">'+esc(v.loai||'—')+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td><td class="r">'+fmtN(v.luu)+'</td><td class="small">'+autoDg(v)+'</td></tr>').join('')+'</table></div>'
+      +newV.sort((a,b)=>a.dang-b.dang).map(v=>'<tr><td class="c">'+ddmm(v.dang)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="small">'+esc(v.loai||'—')+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td><td class="r">'+fmtN(v.luu)+'</td><td class="small">'+autoDg(v)+'</td></tr>').join('')+'</table></div>'
     : emptyMsg('Kỳ này chưa có video mới trong Sheet VIDEO.');
   /* video cũ vẫn ra tiền */
   const oldG=vid.filter(v=>v.gmv&&!inR(v.dang,RA,RB)).sort((a,b)=>b.gmv-a.gmv);
@@ -748,16 +751,6 @@ function contentBlock(a,b,emptyText){
         const userAds=CONTENT_ADS_COL>=0?cl(r[CONTENT_ADS_COL]):'';
         const adsC='<td class="c">'+(userAds?'<span class="tag ads">'+esc(userAds)+'</span>':adsGoiY(r[CI.loai]))+'</td>';
         return '<tr'+cls+'><td class="c">'+(cl(r[CI.air])?cl(r[CI.air]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td><td class="c small">'+(P(r[CI.quay])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[CI.dung])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(r[CI.tiendo])+'</td><td class="c small">'+esc(r[CI.duyet]||'—')+'</td>'+adsC+'</tr>'; }).join('')+'</table></div>';
-  h+='<div class="secnote">Cột «Chạy ads?» đang là gợi ý tự động theo loại clip — khi team thêm cột ads vào sheet lịch content thì giá trị team ghi (chữ đỏ) sẽ thay gợi ý.</div>';
-  /* cẩm nang: loại video nào chạy được quảng cáo TikTok */
-  h+='<div class="card" style="margin:10px 0"><h4>備忘 Cẩm Nang — Loại Video Nào Chạy Được Ads TikTok</h4><div class="tblwrap" style="border:none;margin:0"><table>'
-    +'<tr><th>Loại video</th><th class="c">Chạy ads?</th><th>Ghi chú</th></tr>'
-    +'<tr><td class="vidname">Hướng dẫn / mẹo (cách sơn, tính m²…)</td><td class="c"><span class="tag org">RẤT HỢP</span></td><td class="small">dạng ads hiệu quả nhất với ngành sơn/sàn — giữ chân người xem tốt, dễ gắn giỏ hàng</td></tr>'
-    +'<tr><td class="vidname">Thương mại / giới thiệu sản phẩm</td><td class="c"><span class="tag org">HỢP</span></td><td class="small">gắn sản phẩm trực tiếp — cần quay rõ công dụng, giá, tránh nói quá («bền vĩnh viễn», «tốt nhất thị trường» dễ bị từ chối duyệt)</td></tr>'
-    +'<tr><td class="vidname">Sale / khuyến mãi</td><td class="c"><span class="tag org">HỢP</span></td><td class="small">ghi rõ %, thời hạn thật — TikTok từ chối khuyến mãi mập mờ; nên đẩy ads 1-2 ngày trước sale</td></tr>'
-    +'<tr><td class="vidname">Giải trí / skit hài</td><td class="c"><span class="tag gold">TUỲ</span></td><td class="small">chạy được nếu sản phẩm xuất hiện tự nhiên trong clip; thuần giải trí thì để organic nuôi kênh, đừng tốn tiền ads</td></tr>'
-    +'<tr><td class="vidname">Lưu ý chung</td><td class="c">—</td><td class="small">video dùng nhạc thương mại được cấp phép (nhạc trend thường KHÔNG được dùng cho ads) · hình before/after quá lố dễ bị từ chối</td></tr>'
-    +'</table></div></div>';
   return h;
 }
 
