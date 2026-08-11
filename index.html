@@ -601,15 +601,8 @@ function renderS1(){
   const spAll=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='SANPHAM');
   const sp=spAll.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,5);
   if(sp.length){
-    h+='<div class="secnote"><b>4 · TOP 5 sản phẩm bán chạy trong tuần</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
+    h+='<div class="secnote"><b>4 · TOP sản phẩm bán được nhờ VIDEO</b> — GMV tất cả kênh trừ phần bán qua LIVE và thẻ sản phẩm</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Đơn</th><th class="r">GMV nhờ video</th></tr>'
       +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
-    /* bán chậm = các sản phẩm NGOÀI top bán chạy — chỉ hiện khi có đủ hơn 5 sản phẩm, tránh cảnh sản phẩm số 1 lại nằm trong bảng «bán chậm» */
-    const conLai=spAll.filter(o=>!sp.includes(o));
-    if(conLai.length){
-      const cham=conLai.slice().sort((a,b)=>((a.mon??a.gmv)||0)-((b.mon??b.gmv)||0)).slice(0,5);
-      h+='<div class="secnote"><b>5 · Sản phẩm bán chậm</b> — ngoài nhóm bán chạy · cần đẩy content hoặc xem lại</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Số lượng</th><th class="r">Tiền (GMV)</th></tr>'
-        +cham.map((o,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
-    } else h+='<div class="secnote">Chưa có bảng «bán chậm» — Sheet mới có '+spAll.length+' sản phẩm, tất cả đều nằm trong nhóm bán chạy. Điền thêm sản phẩm vào Sheet NHANXET (LOAI = SANPHAM) là bảng này tự hiện.</div>';
   }
   /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
   h+=secTitle('評估','Nhận Xét Trong Kỳ',0,'trang tự phân tích từ số liệu — dòng TOT/CHUA trong Sheet (nếu có) hiện thêm bên dưới');
