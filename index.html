@@ -136,6 +136,21 @@ tr.hl2 td{background:#FFF1BF}   /* nền vàng = tuần kế tiếp */
 .projcell li{font-size:12.5px;padding:4px 0}
 .progressbig{height:10px;background:#F1EAE0;border-radius:6px;margin-top:8px;overflow:hidden}
 .progressbig i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:6px}
+/* clip gắn trong khung team */
+.vidbox{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.vidcell{flex:0 0 104px;max-width:104px}
+.vidcell .vt{font-size:11.5px;font-weight:700;color:var(--brown);margin-bottom:4px;line-height:1.3}
+.vidcell video,.vidcell iframe{width:100%;aspect-ratio:9/16;border:1px solid var(--border);border-radius:10px;background:#000;display:block;cursor:pointer}
+.vidcell .vt{font-size:10.5px}
+.vthumb{position:relative}
+.vthumb:after{content:'';position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(255,255,255,.9) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8 5v14l11-7z' fill='%233D2B1F'/></svg>") center/16px no-repeat;pointer-events:none}
+.vov{position:fixed;inset:0;background:rgba(20,12,6,.94);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.vov video{max-width:94vw;max-height:82vh;border-radius:12px;background:#000}
+.vov .vovt{color:#FFF6EA;font-weight:700;font-size:15px}
+.vov .vovx{position:absolute;top:12px;right:18px;background:none;border:none;color:#FFF6EA;font-size:34px;line-height:1;cursor:pointer;font-family:inherit}
+
+.vidlink{display:inline-block;background:var(--brown2);color:#FFF6EA;border-radius:10px;padding:8px 14px;font-size:12.5px;font-weight:700;text-decoration:none;margin:4px 6px 0 0}
+.vidlink:hover{background:var(--brown)}
 /* 2 team cạnh nhau để so sánh */
 .teamwrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;align-items:start}
 @media(max-width:640px){.teamwrap{grid-template-columns:1fr}}
@@ -146,6 +161,9 @@ tr.hl2 td{background:#FFF1BF}   /* nền vàng = tuần kế tiếp */
 .trow.em li{font-weight:700}
 .tick{color:var(--good);font-weight:800}
 .tick.off{color:#C9BBA8;font-weight:600}
+.vlink{display:inline-block;background:var(--brown2);color:#FFF6EA!important;text-decoration:none;font-size:11px;font-weight:700;border-radius:8px;padding:3px 10px;margin-left:4px;white-space:nowrap}
+.vlink:hover{background:var(--accent)}
+@media print{.vlink{background:none;color:var(--brown)!important;border:1px solid var(--border)}}
 .trow{padding:8px 0;border-top:1px dashed var(--border);font-size:12.5px}
 .trow:first-of-type{border-top:none}
 .trow .no{display:inline-block;min-width:20px;font-weight:800;color:var(--accent)}
@@ -202,6 +220,12 @@ const tabUrl = g => 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?
 /* ═══════════ TIỆN ÍCH ═══════════ */
 const cl = s => (s==null?'':String(s)).trim();
 const esc = s => cl(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+/* escL: như esc nhưng link http(s) tự thành nút bấm xem được */
+const escL = s => esc(s).replace(/(https?:\/\/[^\s,;]+)/g, m=>'<a class="vlink" href="'+m+'" target="_blank" rel="noopener">▶ Xem clip</a>');
+/* localStorage an toàn — mở file trực tiếp từ máy hoặc chế độ riêng tư có thể chặn, không được để vỡ trang */
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 const num = s => { s=cl(s).replace(/\s/g,''); if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,''); if(/^\d+,\d+$/.test(s)) s=s.replace(',','.'); const n=parseFloat(s.replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; };
 const fmtN = n => n===''||n==null||isNaN(n) ? '—' : Number(n).toLocaleString('vi-VN');
 const fmtMoney = n => { n=Number(n)||0; if(n>=1e9) return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ'; if(n>=1e6) return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+'tr'; return n?Math.round(n).toLocaleString('vi-VN')+'đ':'—'; };
@@ -493,7 +517,7 @@ function banner(){
 function render(){
   renderFilters(); renderNav();
   const key='loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB);
-  const saved=localStorage.getItem(key);
+  const saved=lsGet(key);
   if(saved && !editing){
     document.getElementById('app').innerHTML='<div class="banner">Đang xem <b>bản đã sửa tay</b> (chỉ máy này thấy).<button onclick="resetEdit()">Về số liệu gốc</button></div>'+saved;
     return;
@@ -773,6 +797,7 @@ const PROJ_GROUPS={
   CHUAQUAY:'未拍 Chưa quay',
   KHOKHAN:'困難 Khó khăn',
   BUOCTIEP:'下一步 Bước tiếp theo',
+  VIDEO:'影片 Clip đã hoàn thành',
   NHANXET:'評估 Nhận xét',
   KEHOACH:'下週計畫 Kế hoạch tuần sau',
   GHICHU:'備註 Ghi chú'};
@@ -789,7 +814,7 @@ function teamBlock(rows,titleHtml){
   const get=k=>rows.filter(o=>cl(o.muc).toUpperCase()===k).map(o=>o.nd);
   const tiendo=get('TIENDO')[0]||'';
   const mm=tiendo.match(/(\d+)\s*\/\s*(\d+)/); const pc=mm?Math.round(+mm[1]/+mm[2]*100):null;
-  const list=(title,arr)=>arr.length?'<div class="projcell"><h4>'+title+'</h4><ul>'+arr.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>':'';
+  const list=(title,arr)=>arr.length?'<div class="projcell"><h4>'+title+'</h4><ul>'+arr.map(x=>'<li>'+escL(x)+'</li>').join('')+'</ul></div>':'';
   let h=titleHtml;
   h+='<div class="projgrid">';
   if(tiendo) h+='<div class="projcell full"><h4>進度 Tiến độ</h4><div style="font-size:15px;font-weight:700;color:var(--brown)">'+esc(tiendo)+'</div>'
@@ -800,6 +825,34 @@ function teamBlock(rows,titleHtml){
   h+='</div>';
   return h;
 }
+/* dựng ô xem clip: nhận «Tên clip | đường dẫn» — hỗ trợ file .mp4 trong repo, file Google Drive (xem ngay tại trang) và thư mục Drive (mở tab mới) */
+function videoCells(vals){
+  let h='<div class="vidbox">';
+  vals.forEach(v=>{
+    const s=cl(v); const m=s.match(/(https?:\/\/\S+|[\w\-./%]+\.mp4)/i);
+    const url=m?m[1]:''; let ten=cl(s.replace(url,'').replace(/[|·—-]\s*$/,'').replace(/^\s*[|·]/,''));
+    if(!url){ h+='<div class="vidcell"><div class="vt">'+esc(s)+'</div></div>'; return; }
+    const dfile=url.match(/drive\.google\.com\/file\/d\/([^/?]+)/);
+    if(/\.mp4($|\?)/i.test(url))
+      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><div class="vthumb"><video preload="metadata" muted playsinline src="'+esc(url)+'#t=0.5" onclick="moVid(this.getAttribute(\'data-src\'),this.getAttribute(\'data-ten\'))" data-src="'+esc(url)+'" data-ten="'+esc(ten||'Clip')+'"></video></div></div>';
+    else if(dfile)
+      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><iframe src="https://drive.google.com/file/d/'+esc(dfile[1])+'/preview" allow="autoplay" allowfullscreen></iframe></div>';
+    else
+      h+='<div style="flex:1 1 100%"><a class="vidlink" href="'+esc(url)+'" target="_blank" rel="noopener">▶ '+esc(ten||'Mở thư mục clip')+'</a></div>';
+  });
+  return h+'</div>';
+}
+/* bấm thumbnail → mở clip to giữa màn hình */
+function moVid(src,ten){
+  const d=document.createElement('div'); d.className='vov';
+  d.innerHTML='<button class="vovx" onclick="dongVid()">×</button><div class="vovt">'+esc(ten||'')+'</div>'
+    +'<video controls autoplay playsinline src="'+esc(src)+'"></video>';
+  d.addEventListener('click',e=>{ if(e.target===d) dongVid(); });
+  document.body.appendChild(d); window.__vov=d;
+  document.addEventListener('keydown',escVid);
+}
+function dongVid(){ const d=window.__vov; if(d){ d.remove(); window.__vov=null; } document.removeEventListener('keydown',escVid); }
+function escVid(e){ if(e.key==='Escape') dongVid(); }
 function showProj(name){
   const box=document.getElementById('projBody');
   window.__projKeep=name||null;
@@ -825,9 +878,10 @@ function showProj(name){
           const lbl=k==='TIENDO'?'進度 Tiến độ':(g||k);
           const em=(k==='NHANXET'||k==='KEHOACH')?' em':'';
           c+='<div class="trow'+em+'"><span class="no">'+(i+1)+'.</span><span class="tl">'+esc(lbl)+'</span>';
+          if(k==='VIDEO'&&vals.length){ c+=videoCells(vals)+'</div>'; return; }
           if(!vals.length) c+='<ul><li class="small">—</li></ul>';
           else{
-            c+='<ul>'+vals.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+            c+='<ul>'+vals.map(x=>'<li>'+escL(x)+'</li>').join('')+'</ul>';
             if(k==='TIENDO'){ const mm=vals[0].match(/(\d+)\s*\/\s*(\d+)/);
               if(mm){ const pc=Math.round(+mm[1]/+mm[2]*100);
                 c+='<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:3px">'+pc+'% hoàn thành</div>'; } }
@@ -850,9 +904,9 @@ function toggleEdit(){
   if(editing) enableEdit(); else { disableEdit(); render(); }
 }
 function enableEdit(){ const a=document.getElementById('app'); a.setAttribute('contenteditable','true'); a.addEventListener('input',onEdit); }
-function onEdit(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ localStorage.setItem('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB), document.getElementById('app').innerHTML); },400); }
+function onEdit(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ lsSet('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB), document.getElementById('app').innerHTML); },400); }
 function disableEdit(){ const a=document.getElementById('app'); a.removeAttribute('contenteditable'); a.removeEventListener('input',onEdit); }
-function resetEdit(){ localStorage.removeItem('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB)); render(); }
+function resetEdit(){ lsDel('loho4_edit_'+SEC+'_'+iso(RA)+'_'+iso(RB)); render(); }
 
 load();
 </script>
