@@ -140,7 +140,7 @@ tr.hl2 td{background:#FFF1BF}   /* nền vàng = tuần kế tiếp */
 .vidbox{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 .vidcell{flex:0 0 104px;max-width:104px}
 .vidcell .vt{font-size:11.5px;font-weight:700;color:var(--brown);margin-bottom:4px;line-height:1.3}
-.vidcell video,.vidcell iframe{width:100%;aspect-ratio:9/16;border:1px solid var(--border);border-radius:10px;background:#000;display:block;cursor:pointer}
+.vidcell video,.vidcell iframe,.vidcell .vposter{width:100%;aspect-ratio:9/16;border:1px solid var(--border);border-radius:10px;background:#000;display:block;cursor:pointer;object-fit:cover}
 .vidcell .vt{font-size:10.5px}
 .vthumb{position:relative}
 .vthumb:after{content:'';position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(255,255,255,.9) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8 5v14l11-7z' fill='%233D2B1F'/></svg>") center/16px no-repeat;pointer-events:none}
@@ -834,7 +834,8 @@ function videoCells(vals){
     if(!url){ h+='<div class="vidcell"><div class="vt">'+esc(s)+'</div></div>'; return; }
     const dfile=url.match(/drive\.google\.com\/file\/d\/([^/?]+)/);
     if(/\.mp4($|\?)/i.test(url))
-      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><div class="vthumb"><video preload="metadata" muted playsinline src="'+esc(url)+'#t=0.5" onclick="moVid(this.getAttribute(\'data-src\'),this.getAttribute(\'data-ten\'))" data-src="'+esc(url)+'" data-ten="'+esc(ten||'Clip')+'"></video></div></div>';
+      /* thumbnail = ảnh tĩnh nhẹ (không tải video), bấm mới tải và phát */
+      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><div class="vthumb"><img class="vposter" src="'+esc(url.replace(/\.mp4($|\?)/i,'.jpg'))+'" alt="'+esc(ten||'Clip')+'" loading="lazy" onerror="this.style.background=\'#000\';this.removeAttribute(\'src\')" onclick="moVid(this.getAttribute(\'data-src\'),this.getAttribute(\'data-ten\'))" data-src="'+esc(url)+'" data-ten="'+esc(ten||'Clip')+'"></div></div>';
     else if(dfile)
       h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><iframe src="https://drive.google.com/file/d/'+esc(dfile[1])+'/preview" allow="autoplay" allowfullscreen></iframe></div>';
     else
@@ -846,7 +847,7 @@ function videoCells(vals){
 function moVid(src,ten){
   const d=document.createElement('div'); d.className='vov';
   d.innerHTML='<button class="vovx" onclick="dongVid()">×</button><div class="vovt">'+esc(ten||'')+'</div>'
-    +'<video controls autoplay playsinline src="'+esc(src)+'"></video>';
+    +'<video controls autoplay playsinline preload="auto" src="'+esc(src)+'"></video>';
   d.addEventListener('click',e=>{ if(e.target===d) dongVid(); });
   document.body.appendChild(d); window.__vov=d;
   document.addEventListener('keydown',escVid);
