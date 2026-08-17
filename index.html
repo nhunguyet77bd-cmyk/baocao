@@ -564,6 +564,20 @@ function renderS1(){
     h+='<div class="card"><h4>受眾 Nhân Khẩu Học Người Xem</h4>'+(nk.length?nk.map(barRow).join(''):'<div class="small">Chưa nhập (LOAI = NHANKHAU)</div>')+'</div>';
     h+='</div>';
   }
+  /* ── FOLLOWER ── tổng FL lấy từ NHANXET (LOAI=FOLLOWER, SO_MON=số), tăng ròng lấy từ TONGQUAN cột FOLLOWER_TANG */
+  const flRows=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='FOLLOWER'&&o.d<=RB).sort((a,b)=>b.d-a.d);
+  const flTong=flRows.length?flRows[0].mon:null;
+  const flTang=sum(tq,'fol'), flTangP=tqP.length?sum(tqP,'fol'):null;
+  const soNgay=Math.round((RB-RA)/864e5)+1;
+  if(flTong!=null||flTang){
+    h+='<div class="secnote"><b>粉絲 Follower</b> — quy mô kênh và tốc độ tăng trưởng</div><div class="kpis">'
+      +kpi('總粉絲','Tổng follower',flTong!=null?fmtN(flTong):'—','<span class="badge fl">toàn kênh tính tới cuối kỳ</span>')
+      +kpi('淨增','Follower tăng ròng',(flTang>0?'+':'')+fmtN(flTang||null),pctBadge(flTang,flTangP))
+      +kpi('日均','Trung bình mỗi ngày',flTang?((flTang/soNgay).toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span> follow/ngày</span>'):'—','<span class="badge fl">'+soNgay+' ngày trong kỳ</span>')
+      +kpi('轉換','Follow trên 1.000 view',(flTang&&sum(tq,'xem'))?(flTang/sum(tq,'xem')*1000).toLocaleString('vi-VN',{maximumFractionDigits:2}):'—','<span class="badge fl">bao nhiêu người xem thì có 1 follow</span>')
+      +'</div>';
+    if(flTong!=null&&flTang) h+='<div class="secnote">Với tốc độ '+(flTang/soNgay).toLocaleString('vi-VN',{maximumFractionDigits:1})+' follow/ngày, kênh cần khoảng <b>'+Math.ceil((Math.ceil(flTong/1000)*1000+1000-flTong)/(flTang/soNgay))+' ngày</b> để chạm mốc '+fmtN(Math.ceil(flTong/1000)*1000+1000)+' follower.</div>';
+  }
   /* ── 1 · TOP 5 VIDEO XEM NHIỀU NHẤT TRONG TUẦN ── */
   const medal=i=>i+1;
   const topXem=vid.filter(v=>v.xem).sort((a,b)=>b.xem-a.xem).slice(0,5);
@@ -601,7 +615,7 @@ function renderS1(){
   const spAll=rowsIn(DB.nx).filter(o=>cl(o.loai).toUpperCase()==='SANPHAM');
   const sp=spAll.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,5);
   if(sp.length){
-    h+='<div class="secnote"><b>4 · TOP sản phẩm bán được nhờ VIDEO</b> — GMV tất cả kênh trừ phần bán qua LIVE và thẻ sản phẩm</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Đơn</th><th class="r">GMV nhờ video</th></tr>'
+    h+='<div class="secnote"><b>4 · TOP sản phẩm bán từ VIDEO của shop</b> — chỉ tính video team tự đăng, không gồm KOC/KOL liên kết và LIVE</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Đơn</th><th class="r">GMV từ video shop</th></tr>'
       +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
   }
   /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
@@ -613,8 +627,9 @@ function renderS1(){
     if(!gNew) auto.push({g:false,t:newV.length+' video mới đăng nhưng chưa video nào tạo doanh thu — GMV vẫn dựa vào kho video cũ'});
     else auto.push({g:true,t:newV.length+' video mới đã tạo '+fmtMoney(gNew)+' GMV ('+Math.round(gNew/Math.max(gmv,1)*100)+'% tổng)'}); }
   if(gmv) auto.push({g:pAds<=30,t:pAds<=30?'Organic chiếm '+(100-pAds)+'% GMV — kênh sống khoẻ không phụ thuộc quảng cáo':'Quảng cáo chiếm '+pAds+'% GMV — cần xem lại hiệu quả từng video ads'});
-  const engAll=sum(vid,'xem')?((sum(vid,'tim')+sum(vid,'bl')+sum(vid,'cs'))/sum(vid,'xem')*100):0;
-  if(engAll) auto.push({g:engAll>=2,t:'Tỷ lệ tương tác '+engAll.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% — '+(engAll>=2?'ổn':'hơi thấp, cần hook và kêu gọi tương tác mạnh hơn')});
+  /* tỷ lệ tương tác chỉ tính trên VIDEO MỚI — video cũ có view nhưng không ghi tim/bình luận nên tính chung sẽ méo */
+  const engAll=sum(newV,'xem')?((sum(newV,'tim')+sum(newV,'bl')+sum(newV,'cs'))/sum(newV,'xem')*100):0;
+  if(engAll) auto.push({g:engAll>=1.5,t:'Tỷ lệ tương tác video mới '+engAll.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% — '+(engAll>=1.5?'ổn':'hơi thấp, cần hook và kêu gọi tương tác mạnh hơn')});
   const folS=sum(tq,'fol'); if(folS) auto.push({g:folS>0,t:'Follower '+(folS>0?'tăng ròng +':'giảm ')+fmtN(Math.abs(folS))+' trong kỳ'});
   const nxAll=rowsIn(DB.nx);
   const good=nxAll.filter(o=>cl(o.loai).toUpperCase()==='TOT'), bad=nxAll.filter(o=>cl(o.loai).toUpperCase()==='CHUA');
