@@ -252,6 +252,7 @@ function parseCSV(text){
 /* ═══════════ TRẠNG THÁI ═══════════ */
 const DB = { tq:[], vid:[], duan:[], nx:[] };
 let CONTENT=null, CONTENT_ERR=false, CONTENT_ADS_COL=-1;
+const LOI_TAI={};
 /* vị trí cột trong lịch content — dò lại theo tiêu đề mỗi lần tải */
 let CI={ma:0,ten:1,loai:2,lichquay:5,deadline:6,air:7,quay:9,dung:10,ads:-1,tiendo:11,duyet:12};
 let DEMOTABS=[];             // tab đang dùng số liệu mẫu
@@ -340,7 +341,7 @@ function rowsToObjs(rows, map, reqKeys){
   return out;
 }
 const MAPS = {
-  tq:  {gmv:{i:1,n:1},ads:{i:2,n:1},chi:{i:3,n:1},don:{i:4,n:1},xem:{i:5,n:1},fol:{i:6,n:1},note:{i:7}},
+  tq:  {gmv:{i:1,n:1},ads:{i:2,n:1},chi:{i:3,n:1},don:{i:4,n:1},xem:{i:5,n:1},fol:{i:6,n:1},note:{i:7},tim:{i:8,n:1},bl:{i:9,n:1},cs:{i:10,n:1}},
   vid: {ten:{i:1},dang:{i:2},loai:{i:3},nguon:{i:4},gmv:{i:5,n:1},don:{i:6,n:1},xem:{i:7,n:1},tim:{i:8,n:1},bl:{i:9,n:1},cs:{i:10,n:1},luu:{i:11,n:1},dg:{i:12},chiAds:{i:13,n:1}},
   nx:  {loai:{i:1},nd:{i:2},ghi:{i:3},mon:{i:4,n:1},gmv:{i:5,n:1}}
 };
@@ -360,13 +361,22 @@ function parseDuan(rows){
 async function fetchTab(key,tab){
   const gid=GIDS[tab];
   if(gid===null||gid===undefined||gid===''){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
-  try{
-    const r=await fetch(tabUrl(gid)+'&_cb='+Date.now(),{cache:'no-store'});
-    if(!r.ok) throw 0;
-    const t=await r.text();
-    if(t.trim().startsWith('<')) throw 0;
-    return parseCSV(t);
-  }catch(e){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
+  /* thử 3 cách lấy dữ liệu — chỉ dùng số liệu mẫu khi cả 3 đều hỏng */
+  const cachs=[
+    ()=>fetch(tabUrl(gid)+'&_cb='+Date.now(),{cache:'no-store'}),
+    ()=>fetch(tabUrl(gid),{cache:'reload'}),
+    ()=>fetch(tabUrl(gid))
+  ];
+  for(let i=0;i<cachs.length;i++){
+    try{
+      const r=await cachs[i]();
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const t=await r.text();
+      if(t.trim().startsWith('<')) throw new Error('Sheet chưa công khai');
+      return parseCSV(t);
+    }catch(e){ LOI_TAI[tab]=e.message||String(e); }
+  }
+  DEMOTABS.push(tab); return parseCSV(DEMO[key]);
 }
 async function loadContent(){
   try{
@@ -510,7 +520,7 @@ function emptyMsg(t){ return '<div class="empty">'+t+'</div>'; }
 function banner(){
   let h='';
   if(DEMOTABS.length)
-    h+='<div class="banner">Tab <b>'+DEMOTABS.join(', ')+'</b> đang dùng <b>SỐ LIỆU MẪU</b> — sau khi bạn nạp file <b>BAO-CAO-TIKTOK-LOHO.xlsx</b> lên Google Sheet, nhắn Claude liên kết là số thật tự chạy.</div>';
+    h+='<div class="banner">Tab <b>'+DEMOTABS.join(', ')+'</b> đang dùng <b>SỐ LIỆU MẪU</b> <span class="small">(lý do: '+esc(Object.values(LOI_TAI)[0]||'không rõ')+' — thử tải lại trang)</span> — sau khi bạn nạp file <b>BAO-CAO-TIKTOK-LOHO.xlsx</b> lên Google Sheet, nhắn Claude liên kết là số thật tự chạy.</div>';
   return h;
 }
 
@@ -538,13 +548,19 @@ function renderS1(){
   let ads=sum(tq,'ads'); if(!ads) ads=sum(vid.filter(v=>cl(v.nguon).toUpperCase().startsWith('A')),'gmv');
   const org=Math.max(0,gmv-ads);
   const newV=vid.filter(v=>inR(v.dang,RA,RB)), newVP=vidP.filter(v=>inR(v.dang,pa,pb));
+  const flTopRows=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='FOLLOWER'&&o.d<=RB).sort((a,b)=>b.d-a.d);
+  const flTongTop=flTopRows.length?flTopRows[0].mon:null;
   let h=secTitle('本期總覽','Tổng Quan',1,'GMV video + nguồn ads/organic · trang tự tính % so với kỳ liền trước cùng độ dài');
   h+='<div class="kpis">'
     +kpi('影片GMV','GMV từ video',fmtMoney(gmv),pctBadge(gmv,tqP.length?gmvP:null))
     +kpi('訂單','Đơn hàng từ video',fmtN(sum(tq,'don')||null),pctBadge(sum(tq,'don'),tqP.length?sum(tqP,'don'):null))
-    +kpi('觀看','Tổng lượt xem',fmtN(sum(tq,'xem')||null),pctBadge(sum(tq,'xem'),tqP.length?sum(tqP,'xem'):null))
-    +kpi('影片數','Video mới đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
+    +kpi('觀看','Lượt xem toàn kênh',fmtN(sum(tq,'xem')||null),pctBadge(sum(tq,'xem'),tqP.length?sum(tqP,'xem'):null))
+    +kpi('愛心','Lượt thích trong tuần',fmtN(sum(tq,'tim')||null),pctBadge(sum(tq,'tim'),tqP.length?sum(tqP,'tim'):null))
+    +kpi('留言','Bình luận trong tuần',fmtN(sum(tq,'bl')||null),pctBadge(sum(tq,'bl'),tqP.length?sum(tqP,'bl'):null))
+    +kpi('分享','Chia sẻ trong tuần',fmtN(sum(tq,'cs')||null),pctBadge(sum(tq,'cs'),tqP.length?sum(tqP,'cs'):null))
+    +kpi('影片數','Video đăng trong tuần',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
     +kpi('粉絲','Follower tăng ròng',(sum(tq,'fol')>0?'+':'')+fmtN(sum(tq,'fol')||null),pctBadge(sum(tq,'fol'),tqP.length?sum(tqP,'fol'):null))
+    +kpi('總粉絲','Tổng follower',flTongTop!=null?fmtN(flTongTop):'—','<span class="badge fl">toàn kênh tính tới cuối kỳ</span>')
     +'</div>';
   /* 🎯 mục tiêu cấp sàn — lấy dòng MUCTIEU mới nhất (không giới hạn kỳ) */
   const mts=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='MUCTIEU'&&o.d<=RB).sort((a,b)=>b.d-a.d);
@@ -588,21 +604,6 @@ function renderS1(){
     h+='<div class="card"><h4>受眾 Nhân Khẩu Học Người Xem</h4>'+(nk.length?nk.map(barRow).join(''):'<div class="small">Chưa nhập (LOAI = NHANKHAU)</div>')+'</div>';
     h+='</div>';
   }
-  /* ── FOLLOWER ── tổng FL lấy từ NHANXET (LOAI=FOLLOWER, SO_MON=số), tăng ròng lấy từ TONGQUAN cột FOLLOWER_TANG */
-  const flRows=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='FOLLOWER'&&o.d<=RB).sort((a,b)=>b.d-a.d);
-  const flTong=flRows.length?flRows[0].mon:null;
-  const flTang=sum(tq,'fol'), flTangP=tqP.length?sum(tqP,'fol'):null;
-  const soNgay=Math.round((RB-RA)/864e5)+1;
-  if(flTong!=null||flTang){
-    h+='<div class="secnote"><b>粉絲 Follower</b> — quy mô kênh và tốc độ tăng trưởng</div><div class="kpis">'
-      +kpi('總粉絲','Tổng follower',flTong!=null?fmtN(flTong):'—','<span class="badge fl">toàn kênh tính tới cuối kỳ</span>')
-      +kpi('淨增','Follower tăng ròng',(flTang>0?'+':'')+fmtN(flTang||null),pctBadge(flTang,flTangP))
-      +kpi('日均','Trung bình mỗi ngày',flTang?((flTang/soNgay).toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span> follow/ngày</span>'):'—','<span class="badge fl">'+soNgay+' ngày trong kỳ</span>')
-      +kpi('轉換','Follow trên 1.000 view',(flTang&&sum(tq,'xem'))?(flTang/sum(tq,'xem')*1000).toLocaleString('vi-VN',{maximumFractionDigits:2}):'—','<span class="badge fl">bao nhiêu người xem thì có 1 follow</span>')
-      +'</div>';
-    if(flTong!=null&&flTang) h+='<div class="secnote">Với tốc độ '+(flTang/soNgay).toLocaleString('vi-VN',{maximumFractionDigits:1})+' follow/ngày, kênh cần khoảng <b>'+Math.ceil((Math.ceil(flTong/1000)*1000+1000-flTong)/(flTang/soNgay))+' ngày</b> để chạm mốc '+fmtN(Math.ceil(flTong/1000)*1000+1000)+' follower.</div>';
-  }
-  /* ── 1 · TOP 5 VIDEO XEM NHIỀU NHẤT TRONG TUẦN ── */
   const medal=i=>i+1;
   const topXem=vid.filter(v=>v.xem).sort((a,b)=>b.xem-a.xem).slice(0,5);
   if(topXem.length){
@@ -674,16 +675,19 @@ function renderS2(){
   const vid=rowsIn(DB.vid), vidP=rowsIn(DB.vid,pa,pb);
   const newV=vid.filter(v=>inR(v.dang,RA,RB)), newVP=vidP.filter(v=>inR(v.dang,pa,pb));
   const S=(a,k)=>sum(a,k);
-  const eng=S(vid,'xem')?((S(vid,'tim')+S(vid,'bl')+S(vid,'cs'))/S(vid,'xem')*100):0;
-  let h=secTitle('影片表現','Video Trong Kỳ',0,'video đăng trong kỳ · tương tác · mọi số đều so % với kỳ liền trước');
+  /* CHỈ tính video ĐĂNG TRONG TUẦN — không cộng video cũ, tránh số ảo */
+  const nXem=S(newV,'xem'), nTim=S(newV,'tim'), nBl=S(newV,'bl'), nCs=S(newV,'cs'), nLuu=S(newV,'luu');
+  const eng=nXem?((nTim+nBl+nCs)/nXem*100):0;
+  let h=secTitle('影片表現','Video Đăng Trong Tuần',0,'chỉ tính '+newV.length+' video đăng trong kỳ — không gộp video cũ · so % với kỳ liền trước');
   h+='<div class="kpis">'
     +kpi('新影片','Video đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
-    +kpi('觀看','Lượt xem',fmtN(S(vid,'xem')||null),pctBadge(S(vid,'xem'),vidP.length?S(vidP,'xem'):null))
-    +kpi('愛心','Tim',fmtN(S(vid,'tim')||null),pctBadge(S(vid,'tim'),vidP.length?S(vidP,'tim'):null))
-    +kpi('留言','Bình luận',fmtN(S(vid,'bl')||null),pctBadge(S(vid,'bl'),vidP.length?S(vidP,'bl'):null))
-    +kpi('分享','Chia sẻ',fmtN(S(vid,'cs')||null),pctBadge(S(vid,'cs'),vidP.length?S(vidP,'cs'):null))
-    +kpi('收藏','Lượt lưu',fmtN(S(vid,'luu')||null),pctBadge(S(vid,'luu'),vidP.length?S(vidP,'luu'):null))
+    +kpi('觀看','Lượt xem',fmtN(nXem||null),pctBadge(nXem,newVP.length?S(newVP,'xem'):null))
+    +kpi('愛心','Tim',fmtN(nTim||null),pctBadge(nTim,newVP.length?S(newVP,'tim'):null))
+    +kpi('留言','Bình luận',fmtN(nBl||null),pctBadge(nBl,newVP.length?S(newVP,'bl'):null))
+    +kpi('分享','Chia sẻ',fmtN(nCs||null),pctBadge(nCs,newVP.length?S(newVP,'cs'):null))
+    +kpi('收藏','Lượt lưu',fmtN(nLuu||null),pctBadge(nLuu,newVP.length?S(newVP,'luu'):null))
     +kpi('互動率','Tỷ lệ tương tác',eng?eng.toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span>%</span>':'—','<span class="badge fl">(tim+bl+chia sẻ)/view</span>')
+    +kpi('平均','View trung bình / video',newV.length&&nXem?fmtN(Math.round(nXem/newV.length)):'—','<span class="badge fl">'+newV.length+' video</span>')
     +'</div>';
   /* bảng video mới */
   /* tự đánh giá video khi cột đánh giá bỏ trống */
