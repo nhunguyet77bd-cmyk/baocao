@@ -221,7 +221,12 @@ const tabUrl = g => 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?
 const cl = s => (s==null?'':String(s)).trim();
 const esc = s => cl(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 /* escL: như esc nhưng link http(s) tự thành nút bấm xem được */
-const escL = s => esc(s).replace(/(https?:\/\/[^\s,;]+)/g, m=>'<a class="vlink" href="'+m+'" target="_blank" rel="noopener">▶ Xem clip</a>');
+const escL = s => {
+  /* dạng «Nhãn | https://…» → nút mang đúng tên nhãn */
+  const m = cl(s).match(/^(.+?)\s*[|·]\s*(https?:\/\/\S+)\s*$/);
+  if(m) return '<a class="vlink" href="'+esc(m[2])+'" target="_blank" rel="noopener">▶ '+esc(m[1])+'</a>';
+  return esc(s).replace(/(https?:\/\/[^\s,;]+)/g, u=>'<a class="vlink" href="'+u+'" target="_blank" rel="noopener">▶ Xem clip</a>');
+};
 /* localStorage an toàn — mở file trực tiếp từ máy hoặc chế độ riêng tư có thể chặn, không được để vỡ trang */
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -677,16 +682,15 @@ function renderS2(){
   const S=(a,k)=>sum(a,k);
   /* CHỈ tính video ĐĂNG TRONG TUẦN — không cộng video cũ, tránh số ảo */
   const nXem=S(newV,'xem'), nTim=S(newV,'tim'), nBl=S(newV,'bl'), nCs=S(newV,'cs'), nLuu=S(newV,'luu');
-  const eng=nXem?((nTim+nBl+nCs)/nXem*100):0;
+  const eng=nXem?((nTim+nBl)/nXem*100):0;
   let h=secTitle('影片表現','Video Đăng Trong Tuần',0,'chỉ tính '+newV.length+' video đăng trong kỳ — không gộp video cũ · so % với kỳ liền trước');
   h+='<div class="kpis">'
     +kpi('新影片','Video đăng',fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
     +kpi('觀看','Lượt xem',fmtN(nXem||null),pctBadge(nXem,newVP.length?S(newVP,'xem'):null))
     +kpi('愛心','Tim',fmtN(nTim||null),pctBadge(nTim,newVP.length?S(newVP,'tim'):null))
     +kpi('留言','Bình luận',fmtN(nBl||null),pctBadge(nBl,newVP.length?S(newVP,'bl'):null))
-    +kpi('分享','Chia sẻ',fmtN(nCs||null),pctBadge(nCs,newVP.length?S(newVP,'cs'):null))
     +kpi('收藏','Lượt lưu',fmtN(nLuu||null),pctBadge(nLuu,newVP.length?S(newVP,'luu'):null))
-    +kpi('互動率','Tỷ lệ tương tác',eng?eng.toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span>%</span>':'—','<span class="badge fl">(tim+bl+chia sẻ)/view</span>')
+    +kpi('互動率','Tỷ lệ tương tác',eng?eng.toLocaleString('vi-VN',{maximumFractionDigits:1})+'<span>%</span>':'—','<span class="badge fl">(tim + bình luận) / lượt xem</span>')
     +kpi('平均','View trung bình / video',newV.length&&nXem?fmtN(Math.round(nXem/newV.length)):'—','<span class="badge fl">'+newV.length+' video</span>')
     +'</div>';
   /* bảng video mới */
@@ -703,8 +707,8 @@ function renderS2(){
   };
   h+='<div class="secnote"><b>Video đăng trong kỳ</b> — cột đánh giá bỏ trống thì trang tự nhận xét</div>';
   h+= newV.length
-    ? '<div class="tblwrap"><table><tr><th class="c">Ngày</th><th>Video</th><th>Loại</th><th class="r">View</th><th class="r">Tim</th><th class="r">BL</th><th class="r">Share</th><th class="r">Lưu</th><th>Đánh giá</th></tr>'
-      +newV.sort((a,b)=>a.dang-b.dang).map(v=>'<tr><td class="c">'+ddmm(v.dang)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="small">'+esc(v.loai||'—')+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td><td class="r">'+fmtN(v.luu)+'</td><td class="small">'+autoDg(v)+'</td></tr>').join('')+'</table></div>'
+    ? '<div class="tblwrap"><table><tr><th class="c">Ngày</th><th>Video</th><th>Loại</th><th class="r">View</th><th class="r">Tim</th><th class="r">BL</th><th class="r">Lưu</th><th>Đánh giá</th></tr>'
+      +newV.sort((a,b)=>a.dang-b.dang).map(v=>'<tr><td class="c">'+ddmm(v.dang)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="small">'+esc(v.loai||'—')+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.luu)+'</td><td class="small">'+autoDg(v)+'</td></tr>').join('')+'</table></div>'
     : emptyMsg('Kỳ này chưa có video mới trong Sheet VIDEO.');
   /* video cũ vẫn ra tiền */
   const oldG=vid.filter(v=>v.gmv&&!inR(v.dang,RA,RB)).sort((a,b)=>b.gmv-a.gmv);
@@ -804,7 +808,8 @@ const PROJ_GROUPS={
   VIDEO:'影片 Clip đã hoàn thành',
   NHANXET:'評估 Nhận xét',
   KEHOACH:'下週計畫 Kế hoạch tuần sau',
-  GHICHU:'備註 Ghi chú'};
+  GHICHU:'備註 Ghi chú',
+  LIENKET:'連結 Link liên quan'};
 function renderS3(){
   let h=secTitle('專案追蹤','Dự Án Riêng',0,'chọn dự án trong ô dưới mới hiện chi tiết · hai team hiển thị song song để so sánh');
   const projs=[...new Set(DB.duan.map(o=>o.duAn).filter(Boolean))];
