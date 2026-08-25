@@ -809,6 +809,7 @@ const PROJ_GROUPS={
   NHANXET:'評估 Nhận xét',
   KEHOACH:'下週計畫 Kế hoạch tuần sau',
   GHICHU:'備註 Ghi chú',
+  DATTEN:'命名 Chọn tên kênh — mọi người bỏ phiếu 2 tên',
   LIENKET:'連結 Link liên quan'};
 function renderS3(){
   let h=secTitle('專案追蹤','Dự Án Riêng',0,'chọn dự án trong ô dưới mới hiện chi tiết · hai team hiển thị song song để so sánh');
@@ -818,11 +819,20 @@ function renderS3(){
     +projs.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join('')+'</select><div id="projBody"></div></div>';
   return h;
 }
+/* % tiến độ: chỉ nhận dạng «3/5», BỎ QUA ngày tháng (27/08/2026 từng bị tính thành 338%) */
+function pctOf(s){
+  const t=String(s||'').replace(/\d{1,2}\s*\/\s*\d{1,2}\s*\/\s*\d{2,4}/g,' ');
+  const m=t.match(/(\d{1,3})\s*\/\s*(\d{1,3})(?!\s*\/)/);
+  if(!m) return null;
+  const a=+m[1], b=+m[2];
+  if(!b||a>b) return null;
+  return Math.round(a/b*100);
+}
 const TEAM_LABEL=t=>{ const u=cl(t).toUpperCase(); if(u==='GENZ')return'Team GENZ'; if(u==='THANHBINH')return'Team THANH BÌNH'; return u?'Team '+cl(t):''; };
 function teamBlock(rows,titleHtml){
   const get=k=>rows.filter(o=>cl(o.muc).toUpperCase()===k).map(o=>o.nd);
   const tiendo=get('TIENDO')[0]||'';
-  const mm=tiendo.match(/(\d+)\s*\/\s*(\d+)/); const pc=mm?Math.round(+mm[1]/+mm[2]*100):null;
+  const pc=pctOf(tiendo);
   const list=(title,arr)=>arr.length?'<div class="projcell"><h4>'+title+'</h4><ul>'+arr.map(x=>'<li>'+escL(x)+'</li>').join('')+'</ul></div>':'';
   let h=titleHtml;
   h+='<div class="projgrid">';
@@ -869,7 +879,7 @@ function showProj(name){
   if(!name){ box.innerHTML=''; return; }
   const all=DB.duan.filter(o=>o.duAn===name);
   const rows=all.filter(o=>inR(o.d,RA,RB));
-  let h='';
+  let h='', hTeam='';
   if(!rows.length) h+=emptyMsg('Kỳ đang xem chưa có ghi chép cho dự án này — chọn tuần khác trên lịch để xem lại các kỳ trước.');
   else{
     const named=[...new Set(rows.filter(o=>cl(o.team)).map(o=>cl(o.team).toUpperCase()))].sort();
@@ -879,7 +889,7 @@ function showProj(name){
       const order=['TIENDO'].concat(Object.keys(PROJ_GROUPS));
       const used=[...new Set(rows.filter(o=>cl(o.team)).map(o=>cl(o.muc).toUpperCase()))];
       const fields=order.filter(k=>used.includes(k)).concat(used.filter(k=>!order.includes(k)));
-      h+='<div class="teamwrap">'+named.map(t=>{
+      hTeam+='<div class="teamwrap">'+named.map(t=>{
         const trs=rows.filter(o=>cl(o.team).toUpperCase()===t);
         const get=k=>trs.filter(o=>cl(o.muc).toUpperCase()===k).map(o=>o.nd);
         let c='<div class="teamcard"><div class="tname">'+esc(TEAM_LABEL(t))+'</div>';
@@ -892,16 +902,18 @@ function showProj(name){
           if(!vals.length) c+='<ul><li class="small">—</li></ul>';
           else{
             c+='<ul>'+vals.map(x=>'<li>'+escL(x)+'</li>').join('')+'</ul>';
-            if(k==='TIENDO'){ const mm=vals[0].match(/(\d+)\s*\/\s*(\d+)/);
-              if(mm){ const pc=Math.round(+mm[1]/+mm[2]*100);
-                c+='<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:3px">'+pc+'% hoàn thành</div>'; } }
+            if(k==='TIENDO'){ const pc=pctOf(vals[0]);
+              if(pc!==null)
+                c+='<div class="progressbig"><i style="width:'+pc+'%"></i></div><div class="small" style="margin-top:3px">'+pc+'% hoàn thành</div>'; }
           }
           c+='</div>';
         });
         return c+'</div>';
       }).join('')+'</div>';
     }
-    if(chung.length) h+=teamBlock(chung,'<div class="secnote" style="margin-top:10px;font-size:13px"><b>Chung cả dự án</b></div>');
+    /* khối CHUNG lên trên, 2 khung team xuống dưới */
+    if(chung.length) h+=teamBlock(chung,'<div class="secnote" style="font-size:13px"><b>Chung cả dự án</b></div>');
+    if(hTeam) h+='<div class="secnote" style="margin-top:14px;font-size:13px"><b>Chi tiết từng team</b></div>'+hTeam;
   }
   box.innerHTML=h;
 }
