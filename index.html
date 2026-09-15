@@ -33,10 +33,18 @@ header h1 .gold{color:#E8C79B}
 .wkbtn:hover{background:var(--accent);color:#fff}
 .day{border:1px solid transparent;border-radius:6px;padding:3px 0;font-size:10.5px;cursor:pointer;position:relative;background:transparent;font-family:inherit;color:var(--text)}
 .day:hover{border-color:var(--accent)}
-.day.out{color:#CBBBA6;pointer-events:none}
+.day.out{color:#C4B49E}
 .day.dot::after{content:'';position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
 .day.inr{background:#F3E4CF}
 .day.edge{background:var(--brown2);color:#FFF6EA;font-weight:700}
+.perbar{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.per{display:flex;flex-direction:column;align-items:flex-start;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:6px 13px;cursor:pointer;font-family:inherit;min-width:158px;text-align:left;transition:border-color .15s}
+.per:hover{border-color:var(--accent)}
+.per .pl{font-size:9px;letter-spacing:.08em;color:#9C8974;font-weight:600}
+.per .pv{font-size:13.5px;font-weight:700;color:var(--brown);line-height:1.35}
+.per .px{font-size:9.5px;color:#9C8974;font-weight:500}
+.per.on{border-color:var(--brown2);background:#FBF6EE}
+.calwarn{max-width:320px;margin:8px auto 0;font-size:11px;color:#B4442E;line-height:1.45}
 .calfoot{display:flex;gap:5px;justify-content:center;margin-top:6px;flex-wrap:wrap}
 .calfoot .chip{font-size:10px;padding:4px 10px}
 #rangeLabel{margin-top:10px;font-size:13px}
@@ -146,6 +154,7 @@ tr.hl2 td{background:#FFF1BF}   /* nền vàng = tuần kế tiếp */
 .vthumb:after{content:'';position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(255,255,255,.9) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8 5v14l11-7z' fill='%233D2B1F'/></svg>") center/16px no-repeat;pointer-events:none}
 .vov{position:fixed;inset:0;background:rgba(20,12,6,.94);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
 .vov video{max-width:94vw;max-height:82vh;border-radius:12px;background:#000}
+.vov iframe{width:min(94vw,460px);height:min(82vh,818px);border:0;border-radius:12px;background:#000}
 .vov .vovt{color:#FFF6EA;font-weight:700;font-size:15px}
 .vov .vovx{position:absolute;top:12px;right:18px;background:none;border:none;color:#FFF6EA;font-size:34px;line-height:1;cursor:pointer;font-family:inherit}
 
@@ -192,8 +201,8 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text2)}
 
 <div class="filterbar" id="filterbar" style="display:none">
   <div class="mrow" id="monthChips"></div>
+  <div class="perbar" id="perBar"></div>
   <div class="calwrap" id="calBox"></div>
-  <div id="rangeLabel"></div>
   <div class="nav" id="navTabs" style="display:none"></div>
 </div>
 
@@ -262,8 +271,9 @@ const LOI_TAI={};
 let CI={ma:0,ten:1,loai:2,lichquay:5,deadline:6,air:7,quay:9,dung:10,ads:-1,tiendo:11,duyet:12};
 let DEMOTABS=[];             // tab đang dùng số liệu mẫu
 let RA=null, RB=null;        // khoảng ngày đang xem
+let CA=null, CB=null;        // khoảng KỲ SO SÁNH tự chọn (null = trang tự lùi kỳ liền trước)
 let CURMONTH=null, CURYEAR=null;
-let calOpen=false;           // lịch tháng chỉ bung khi bấm chip tháng
+let calOpen=null;            // null = đóng · 'cur' = đang đặt kỳ đang xem · 'cmp' = đang đặt kỳ so sánh
 let SEC='s1';                // mục đang mở
 let pickStart=null;          // đang chọn ngày đầu của range tuỳ chỉnh
 let editing=false, saveTimer=null;
@@ -426,7 +436,39 @@ async function load(){
 /* ═══════════ LỌC THEO KHOẢNG NGÀY ═══════════ */
 const inR=(d,a,b)=>d&&d>=a&&d<=b;
 const rowsIn=(arr,a,b)=>arr.filter(o=>inR(o.d,a||RA,b||RB));
-function prevRange(){ const len=Math.round((RB-RA)/864e5)+1; return [addD(RA,-len), addD(RA,-1)]; }
+/* đang xem NGUYÊN 1 THÁNG? (mùng 1 → ngày cuối tháng) */
+function isWholeMonth(){
+  return RA&&RB&&RA.getDate()===1&&RA.getMonth()===RB.getMonth()&&RA.getFullYear()===RB.getFullYear()
+    &&RB.getDate()===new Date(RB.getFullYear(),RB.getMonth()+1,0).getDate();
+}
+/* kỳ so sánh: nếu user TỰ CHỌN (CA/CB) thì dùng đúng khoảng đó;
+   không chọn → tự động: xem nguyên tháng so NGUYÊN THÁNG TRƯỚC, còn lại lùi đúng số ngày */
+function prevRange(){
+  if(CA&&CB) return [CA,CB];
+  if(isWholeMonth()){
+    const y=RA.getFullYear(), m=RA.getMonth();
+    return [new Date(y,m-1,1), new Date(y,m,0)];
+  }
+  const len=Math.round((RB-RA)/864e5)+1; return [addD(RA,-len), addD(RA,-1)];
+}
+/* nhãn kỳ so sánh dùng trong mọi badge/nhận xét */
+function prevLabel(){
+  if(CA&&CB){
+    const cm0=new Date(CA.getFullYear(),CA.getMonth(),1), cm1=new Date(CA.getFullYear(),CA.getMonth()+1,0);
+    if(sameD(CA,cm0)&&sameD(CB,cm1)) return 'tháng '+(CA.getMonth()+1)+'/'+CA.getFullYear();
+    return ddmm(CA)+'–'+ddmm(CB)+'/'+CB.getFullYear();
+  }
+  if(isWholeMonth()){ const p=new Date(RA.getFullYear(),RA.getMonth()-1,1); return 'tháng '+(p.getMonth()+1)+'/'+p.getFullYear(); }
+  const days=Math.round((RB-RA)/864e5)+1;
+  return days===7?'tuần trước':'kỳ trước';
+}
+/* mô tả dài kỳ so sánh, kèm cảnh báo lệch độ dài */
+function cmpInfo(){
+  const [pa,pb]=prevRange();
+  const dCur=Math.round((RB-RA)/864e5)+1, dCmp=Math.round((pb-pa)/864e5)+1;
+  return {pa,pb,dCur,dCmp,custom:!!(CA&&CB),
+    txt:ddmm(pa)+'/'+pa.getFullYear()+' – '+ddmm(pb)+'/'+pb.getFullYear()+' ('+dCmp+' ngày)'};
+}
 const sum=(arr,k)=>arr.reduce((t,o)=>t+(Number(o[k])||0),0);
 function dataDates(){ const s=new Set(); [...DB.tq,...DB.vid,...DB.duan,...DB.nx].forEach(o=>o.d&&s.add(iso(o.d))); return s; }
 
@@ -438,66 +480,108 @@ function rangeLabel(){
   return [ddmm(RA)+'/'+RA.getFullYear()+' – '+ddmm(RB)+'/'+RB.getFullYear(),days+' NGÀY'];
 }
 
-/* ═══════════ BỘ LỌC: THÁNG 1 DÒNG + LỊCH ═══════════ */
+/* ═══════════ BỘ LỌC: THÁNG · 2 Ô KỲ · LỊCH ═══════════
+   calOpen = null (đóng) | 'cur' (đang đặt kỳ đang xem) | 'cmp' (đang đặt kỳ so sánh)
+   Lịch chỉ tô DUY NHẤT khoảng đang sửa — không tô chồng 2 kỳ cho đỡ rối. */
 function renderFilters(){
+  const oldW=document.getElementById('calWarn'); if(oldW) oldW.remove();
   const dset=dataDates();
-  const monthsWith=new Set([...dset].map(s=>+s.slice(5,7)));
   let mh='';
   for(let m=1;m<=12;m++)
     mh+='<button class="chip'+(m===CURMONTH?' on':'')+'" onclick="pickMonth('+m+')">T'+m+'</button>';
   document.getElementById('monthChips').innerHTML=mh;
 
-  /* lịch tháng — chỉ hiện khi calOpen */
+  const ci=cmpInfo(), [lb,kind]=rangeLabel();
+
+  /* 2 ô kỳ — bấm ô nào thì bung lịch sửa ô đó */
+  document.getElementById('perBar').innerHTML=
+     '<button class="per'+(calOpen==='cur'?' on':'')+'" onclick="openCal(\'cur\')">'
+    +'<span class="pl">KỲ ĐANG XEM</span><span class="pv">'+ddmm(RA)+' – '+ddmm(RB)+'/'+RB.getFullYear()+'</span>'
+    +'<span class="px">'+kind.toLowerCase()+'</span></button>'
+    +'<button class="per'+(calOpen==='cmp'?' on':'')+'" onclick="openCal(\'cmp\')">'
+    +'<span class="pl">SO VỚI</span><span class="pv">'+ddmm(ci.pa)+' – '+ddmm(ci.pb)+'/'+ci.pb.getFullYear()+'</span>'
+    +'<span class="px">'+(ci.custom?'tự chọn · bấm để đổi':'tự động · bấm để đổi')+'</span></button>';
+
+  document.getElementById('hsub').innerHTML='本期 Kỳ đang xem: <b>'+lb+'</b> · 對比 so với <b>'+prevLabel()+'</b>';
+
   const box=document.getElementById('calBox');
-  if(!calOpen){
-    box.style.display='none';
-    const [lb,kind]=rangeLabel();
-    document.getElementById('rangeLabel').innerHTML='Đang xem: <b>'+lb+'</b> <span class="tag gold" style="margin-left:6px">'+kind+'</span>';
-    document.getElementById('hsub').innerHTML='本期 Kỳ đang xem: <b>'+lb+'</b> · trang tự đọc Google Sheet + lịch content';
-    return;
-  }
+  if(!calOpen){ box.style.display='none'; return; }
   box.style.display='';
+
+  /* khoảng đang sửa */
+  const [SA,SB]= calOpen==='cmp' ? [ci.pa,ci.pb] : [RA,RB];
   const y=CURYEAR, m=CURMONTH-1;
   const first=new Date(y,m,1), last=new Date(y,m+1,0);
   const lead=(first.getDay()+6)%7;
-  let cal='<div class="calhead"><span></span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div>';
+
+  let cal='<div class="hint" style="margin:0 0 7px;font-weight:700;color:var(--brown)">Đang chọn ngày cho: '
+    +(calOpen==='cmp'?'KỲ SO SÁNH':'KỲ ĐANG XEM')+'</div>';
+  cal+='<div class="calhead"><span></span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div>';
+  /* vẽ thêm 1 hàng của tháng sau để chọn được khoảng vắt qua 2 tháng (vd 31/07–06/08) */
   let d=addD(first,-lead), wi=1;
-  while(d<=last){
+  while(true){
     const mon=d;
     cal+='<div class="calrow"><button class="wkbtn" onclick="pickWeekOf(\''+iso(mon)+'\')" title="Chọn nguyên tuần">T'+wi+'</button>';
     for(let i=0;i<7;i++){
       const out=d.getMonth()!==m;
       const cls=['day']; if(out)cls.push('out');
       if(dset.has(iso(d)))cls.push('dot');
-      if(inR(d,RA,RB))cls.push('inr');
-      if(sameD(d,RA)||sameD(d,RB))cls.push('edge');
+      if(inR(d,SA,SB))cls.push('inr');
+      if(sameD(d,SA)||sameD(d,SB))cls.push('edge');
       if(pickStart&&sameD(d,pickStart))cls.push('edge');
       cal+='<button class="'+cls.join(' ')+'" onclick="pickDay(\''+iso(d)+'\')">'+d.getDate()+'</button>';
       d=addD(d,1);
     }
     cal+='</div>'; wi++;
+    if(mon>last) break;      /* vừa vẽ xong hàng đã hoàn toàn sang tháng sau */
   }
-  cal+='<div class="calfoot"><button class="chip" onclick="pickWholeMonth()">Cả tháng '+CURMONTH+'</button><button class="chip" onclick="pickLast7()">7 ngày dữ liệu mới nhất</button></div>';
-  cal+='<div class="hint">Bấm nút <b>T«n»</b> đầu hàng chọn nguyên tuần · bấm <b>ngày đầu rồi ngày cuối</b> tự chọn khoảng · chấm nâu = ngày có dữ liệu</div>';
+  cal+='<div class="calfoot"><button class="chip" onclick="pickWholeMonth()">Cả tháng '+CURMONTH+'</button>'
+    +(calOpen==='cur'?'<button class="chip" onclick="pickLast7()">7 ngày mới nhất</button>':'')
+    +(calOpen==='cmp'?'<button class="chip" onclick="pickSameLast()">Cùng kỳ tháng trước</button>':'')
+    +(calOpen==='cmp'&&ci.custom?'<button class="chip" onclick="resetCmp()">Về tự động</button>':'')
+    +'</div>';
+  cal+='<div class="hint">'+(pickStart
+      ? 'Đã chọn ngày đầu <b>'+ddmm(pickStart)+'</b> — bấm tiếp ngày cuối. Ngày cuối ở tháng khác thì bấm chip tháng đó rồi bấm, khoảng chọn vẫn giữ.'
+      : 'Bấm <b>ngày đầu → ngày cuối</b>, hoặc nút <b>T«n»</b> đầu hàng để lấy nguyên tuần. Ngày mờ (tháng khác) vẫn bấm được.')+'</div>';
   box.innerHTML=cal;
 
-  const [lb,kind]=rangeLabel();
-  document.getElementById('rangeLabel').innerHTML='Đang xem: <b>'+lb+'</b> <span class="tag gold" style="margin-left:6px">'+kind+'</span>'+(pickStart?' · <span class="small">đã chọn ngày đầu <b>'+ddmm(pickStart)+'</b> — bấm ngày cuối</span>':'');
-  document.getElementById('hsub').innerHTML='本期 Kỳ đang xem: <b>'+lb+'</b> · trang tự đọc Google Sheet + lịch content';
+  if(ci.dCur!==ci.dCmp)
+    box.insertAdjacentHTML('afterend','<div class="calwarn" id="calWarn">Kỳ đang xem '+ci.dCur+' ngày nhưng kỳ so sánh '+ci.dCmp+' ngày — % chênh lệch sẽ lệch do khác độ dài.</div>');
 }
-function pickMonth(m){
-  if(m===CURMONTH && calOpen){ calOpen=false; renderFilters(); return; }  /* bấm lại chip đang mở = đóng lịch */
-  CURMONTH=m; pickStart=null; calOpen=true;
+function openCal(mode){
+  if(calOpen===mode){ calOpen=null; pickStart=null; renderFilters(); return; }  /* bấm lại = đóng */
+  calOpen=mode; pickStart=null;
+  const base = mode==='cmp' ? cmpInfo().pa : RA;
+  CURMONTH=base.getMonth()+1; CURYEAR=base.getFullYear();
   renderFilters();
 }
+function pickMonth(m){
+  CURMONTH=m;                       /* GIỮ pickStart: chọn ngày đầu tháng này, đổi chip rồi bấm ngày cuối tháng khác */
+  if(!calOpen) calOpen='cur';
+  renderFilters();
+}
+/* kỳ so sánh = đúng khoảng này nhưng lùi 1 tháng */
+function pickSameLast(){
+  const a=new Date(RA.getFullYear(),RA.getMonth()-1,RA.getDate());
+  const b=new Date(RB.getFullYear(),RB.getMonth()-1,RB.getDate());
+  CA=a; CB=b; pickStart=null; calOpen=null; render();
+}
+/* đặt khoảng vừa chọn vào đúng ô đang mở lịch */
+function setRange(a,b){
+  if(calOpen==='cmp'){ CA=a; CB=b; } else { RA=a; RB=b; }
+  pickStart=null; calOpen=null; render();
+}
+function resetCmp(){ CA=null; CB=null; pickStart=null; calOpen=null; render(); }
 function pickDay(s){
   const d=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));
   if(!pickStart){ pickStart=d; renderFilters(); return; }
-  RA=pickStart<=d?pickStart:d; RB=pickStart<=d?d:pickStart; pickStart=null; calOpen=false; render();
+  setRange(pickStart<=d?pickStart:d, pickStart<=d?d:pickStart);
 }
-function pickWeekOf(s){ const d=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); RA=d; RB=addD(d,6); pickStart=null; calOpen=false; render(); }
-function pickWholeMonth(){ RA=new Date(CURYEAR,CURMONTH-1,1); RB=new Date(CURYEAR,CURMONTH,0); pickStart=null; calOpen=false; render(); }
-function pickLast7(){ const all=[...dataDates()].sort(); if(!all.length)return; const s=all[all.length-1]; RB=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); RA=addD(RB,-6); CURMONTH=RB.getMonth()+1; pickStart=null; calOpen=false; render(); }
+function pickWeekOf(s){ const d=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); setRange(d,addD(d,6)); }
+function pickWholeMonth(){ setRange(new Date(CURYEAR,CURMONTH-1,1), new Date(CURYEAR,CURMONTH,0)); }
+function pickLast7(){ const all=[...dataDates()].sort(); if(!all.length)return; const s=all[all.length-1];
+  const b=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)); CURMONTH=b.getMonth()+1; CURYEAR=b.getFullYear();
+  setRange(addD(b,-6), b); }
 
 /* ═══════════ NAV 4 MỤC ═══════════ */
 const SECS=[
@@ -856,7 +940,8 @@ function videoCells(vals){
       /* thumbnail = ảnh tĩnh nhẹ (không tải video), bấm mới tải và phát */
       h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><div class="vthumb"><img class="vposter" src="'+esc(url.replace(/\.mp4($|\?)/i,'.jpg'))+'" alt="'+esc(ten||'Clip')+'" loading="lazy" onerror="this.style.background=\'#000\';this.removeAttribute(\'src\')" onclick="moVid(this.getAttribute(\'data-src\'),this.getAttribute(\'data-ten\'))" data-src="'+esc(url)+'" data-ten="'+esc(ten||'Clip')+'"></div></div>';
     else if(dfile)
-      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><iframe src="https://drive.google.com/file/d/'+esc(dfile[1])+'/preview" allow="autoplay" allowfullscreen></iframe></div>';
+      /* file Drive: chỉ tải ảnh bìa nhẹ, bấm mới mở trình phát Drive — không nhúng 10 iframe cùng lúc */
+      h+='<div class="vidcell"><div class="vt">'+esc(ten||'Clip')+'</div><div class="vthumb"><img class="vposter" src="https://drive.google.com/thumbnail?id='+esc(dfile[1])+'&sz=w480" alt="'+esc(ten||'Clip')+'" loading="lazy" onerror="this.style.background=\'#000\';this.removeAttribute(\'src\')" onclick="moDrive(this.getAttribute(\'data-id\'),this.getAttribute(\'data-ten\'))" data-id="'+esc(dfile[1])+'" data-ten="'+esc(ten||'Clip')+'"></div></div>';
     else
       h+='<div style="flex:1 1 100%"><a class="vidlink" href="'+esc(url)+'" target="_blank" rel="noopener">▶ '+esc(ten||'Mở thư mục clip')+'</a></div>';
   });
@@ -867,6 +952,15 @@ function moVid(src,ten){
   const d=document.createElement('div'); d.className='vov';
   d.innerHTML='<button class="vovx" onclick="dongVid()">×</button><div class="vovt">'+esc(ten||'')+'</div>'
     +'<video controls autoplay playsinline preload="auto" src="'+esc(src)+'"></video>';
+  d.addEventListener('click',e=>{ if(e.target===d) dongVid(); });
+  document.body.appendChild(d); window.__vov=d;
+  document.addEventListener('keydown',escVid);
+}
+/* bấm ảnh bìa clip Drive → mở trình phát Drive to giữa màn hình */
+function moDrive(id,ten){
+  const d=document.createElement('div'); d.className='vov';
+  d.innerHTML='<button class="vovx" onclick="dongVid()">×</button><div class="vovt">'+esc(ten||'')+'</div>'
+    +'<iframe src="https://drive.google.com/file/d/'+esc(id)+'/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>';
   d.addEventListener('click',e=>{ if(e.target===d) dongVid(); });
   document.body.appendChild(d); window.__vov=d;
   document.addEventListener('keydown',escVid);
