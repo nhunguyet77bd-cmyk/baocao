@@ -242,6 +242,8 @@ function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 const num = s => { s=cl(s).replace(/\s/g,''); if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,''); if(/^\d+,\d+$/.test(s)) s=s.replace(',','.'); const n=parseFloat(s.replace(/[^\d.-]/g,'')); return isNaN(n)?0:n; };
 const fmtN = n => n===''||n==null||isNaN(n) ? '—' : Number(n).toLocaleString('vi-VN');
+/* số tiền ĐẦY ĐỦ cho bảng (user: «số chính xác đừng làm tròn») — thẻ KPI vẫn dùng dạng ngắn */
+const fmtMoneyFull = n => { n=Number(n)||0; return n?Math.round(n).toLocaleString('vi-VN')+'đ':'—'; };
 const fmtMoney = n => { n=Number(n)||0; if(n>=1e9) return (n/1e9).toLocaleString('vi-VN',{maximumFractionDigits:2})+' tỷ'; if(n>=1e6) return (n/1e6).toLocaleString('vi-VN',{maximumFractionDigits:1})+'tr'; return n?Math.round(n).toLocaleString('vi-VN')+'đ':'—'; };
 function dmy(s){ const m=cl(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(!m) return null; return new Date(+m[3],+m[2]-1,+m[1]); }
 const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -268,7 +270,7 @@ const DB = { tq:[], vid:[], duan:[], nx:[] };
 let CONTENT=null, CONTENT_ERR=false, CONTENT_ADS_COL=-1;
 const LOI_TAI={};
 /* vị trí cột trong lịch content — dò lại theo tiêu đề mỗi lần tải */
-let CI={ma:0,ten:1,loai:2,lichquay:5,deadline:6,air:7,quay:9,dung:10,ads:-1,tiendo:11,duyet:12};
+let CI={ma:0,ten:1,loai:2,lichquay:5,deadline:6,air:7,quay:9,dung:10,ads:-1,tiendo:-1,duyet:12,link:-1,dienvien:-1};
 let DEMOTABS=[];             // tab đang dùng số liệu mẫu
 let RA=null, RB=null;        // khoảng ngày đang xem
 let CA=null, CB=null;        // khoảng KỲ SO SÁNH tự chọn (null = trang tự lùi kỳ liền trước)
@@ -406,7 +408,8 @@ async function loadContent(){
     CI={ ma:find(/^mã|mã video/,0), ten:find(/title|tiêu đề|tên video/,1), loai:find(/loại/,2),
          lichquay:find(/lịch quay/,5), deadline:find(/deadline/,6), air:find(/ngày air|ngày đăng/,7),
          quay:find(/^đã quay/,9), dung:find(/^đã dựng/,10), ads:find(/ads|quảng cáo/,-1),
-         tiendo:find(/tiến độ/,11), duyet:find(/trạng thái/,12) };
+         tiendo:find(/tiến độ/,-1), duyet:find(/trạng thái/,12),
+         link:find(/link air|link video|^link/,-1), dienvien:find(/diễn viên/,-1) };
     CONTENT_ADS_COL=CI.ads;
     CONTENT=all2.slice(1).filter(x=>cl(x[CI.ten]));
   }catch(e){ CONTENT_ERR=true; }
@@ -699,11 +702,12 @@ function renderS1(){
     h+='<div class="secnote"><b>1 · TOP 5 video được xem nhiều nhất trong tuần</b></div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">View</th><th class="r">Tim</th><th class="r">Bình luận</th><th class="r">Chia sẻ</th></tr>'
       +topXem.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtN(v.xem)+'</b></td><td class="r">'+fmtN(v.tim)+'</td><td class="r">'+fmtN(v.bl)+'</td><td class="r">'+fmtN(v.cs)+'</td></tr>').join('')+'</table></div>';
   }
-  /* ── 2 · TOP 5 VIDEO TẠO DOANH THU ── */
-  const top5G=vid.filter(v=>v.gmv).sort((a,b)=>b.gmv-a.gmv).slice(0,5);
+  /* ── 2 · TOP 10 VIDEO TẠO DOANH THU (user yêu cầu 10, các bảng khác giữ 5) ── */
+  const top5G=vid.filter(v=>v.gmv).sort((a,b)=>b.gmv-a.gmv).slice(0,10);
   if(top5G.length){
-    h+='<div class="secnote"><b>2 · TOP 5 video tạo ra doanh thu</b> — số đơn, số tiền, view, nguồn</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">Số tiền (GMV)</th><th class="r">Số đơn</th><th class="r">View</th><th class="c">Chuyển đổi</th></tr>'
-      +top5G.map((v,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="c">'+(v.don&&v.xem?(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'%':'—')+'</td></tr>').join('')+'</table></div>';
+    const tongTop=sum(top5G,'gmv'), tongDon=sum(top5G,'don');
+    h+='<div class="secnote"><b>2 · TOP 10 video tạo ra doanh thu</b> — số đơn, số tiền, view, nguồn · tổng '+top5G.length+' video: <b>'+fmtMoney(tongTop)+'</b> · '+fmtN(tongDon)+' đơn</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Video</th><th class="c">Nguồn</th><th class="r">Số tiền (GMV)</th><th class="r">Số đơn</th><th class="r">View</th><th class="c">Chuyển đổi</th></tr>'
+      +top5G.map((v,i)=>'<tr><td class="c">'+(i<3?medal(i):(i+1))+'</td><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoneyFull(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="r">'+fmtN(v.xem)+'</td><td class="c">'+(v.don&&v.xem?(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'%':'—')+'</td></tr>').join('')+'</table></div>';
   }
   /* ── 3 · CLIP ĐANG CHẠY QUẢNG CÁO — kèm đánh giá tiền ads vs doanh thu ── */
   const adsV=vid.filter(v=>cl(v.nguon).toUpperCase().startsWith('A')).sort((a,b)=>(b.gmv||0)-(a.gmv||0));
@@ -730,7 +734,7 @@ function renderS1(){
   const sp=spAll.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,5);
   if(sp.length){
     h+='<div class="secnote"><b>4 · TOP sản phẩm bán từ VIDEO của shop</b> — chỉ tính video team tự đăng, không gồm KOC/KOL liên kết và LIVE</div><div class="tblwrap"><table><tr><th class="c">#</th><th>Sản phẩm</th><th class="r">Đơn</th><th class="r">GMV từ video shop</th></tr>'
-      +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoney(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
+      +sp.map((o,i)=>'<tr><td class="c">'+medal(i)+'</td><td class="vidname">'+esc(o.nd)+'</td><td class="r">'+fmtN(o.mon)+'</td><td class="r"><b>'+fmtMoneyFull(o.gmv)+'</b></td></tr>').join('')+'</table></div>';
   }
   /* nhận xét — TRANG TỰ PHÂN TÍCH từ số liệu, cộng thêm dòng nhập tay nếu có */
   h+=secTitle('評估','Nhận Xét Trong Kỳ',0,'trang tự phân tích từ số liệu — dòng TOT/CHUA trong Sheet (nếu có) hiện thêm bên dưới');
@@ -798,7 +802,7 @@ function renderS2(){
   const oldG=vid.filter(v=>v.gmv&&!inR(v.dang,RA,RB)).sort((a,b)=>b.gmv-a.gmv);
   if(oldG.length){
     h+='<div class="secnote"><b>Video cũ vẫn ra tiền trong kỳ</b></div><div class="tblwrap"><table><tr><th>Video</th><th class="c">Nguồn</th><th class="r">GMV</th><th class="r">Đơn</th><th>Đánh giá</th></tr>'
-      +oldG.map(v=>'<tr><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoney(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="small">'+(cl(v.dg)?esc(v.dg):(v.xem&&v.don?'chuyển đổi '+(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'% <span class="small">(tự đánh giá)</span>':''))+'</td></tr>').join('')+'</table></div>';
+      +oldG.map(v=>'<tr><td class="vidname">'+esc(v.ten)+'</td><td class="c"><span class="tag '+(cl(v.nguon).toUpperCase().startsWith('A')?'ads">ADS':'org">ORG')+'</span></td><td class="r"><b>'+fmtMoneyFull(v.gmv)+'</b></td><td class="r">'+fmtN(v.don)+'</td><td class="small">'+(cl(v.dg)?esc(v.dg):(v.xem&&v.don?'chuyển đổi '+(v.don/v.xem*100).toLocaleString('vi-VN',{maximumFractionDigits:2})+'% <span class="small">(tự đánh giá)</span>':''))+'</td></tr>').join('')+'</table></div>';
   }
   /* lịch content — CHỈ trong khoảng thời gian đang lọc */
   h+='<div class="secnote"><b>日曆 Lịch Content Cả Tháng</b> — tự đọc từ Sheet quản lý content, team cập nhật gì là trang thấy liền</div>';
@@ -815,8 +819,9 @@ function renderS2(){
       .sort((a,b)=>pd2(a[CI.air])-pd2(b[CI.air]));
     if(nwk.length){
       h+='<div class="bullets"><div class="b"><span class="ic">•</span><div>Tuần tới dự kiến up <b>'+nwk.length+' video</b></div></div></div>';
-      h+='<div class="tblwrap"><table><tr><th class="c">Ngày đăng</th><th>Video</th><th>Loại</th><th class="c">Tiến độ hiện tại</th><th class="c">Duyệt</th></tr>'
-        +nwk.map(r=>'<tr><td class="c">'+cl(r[CI.air]).split('/').slice(0,2).join('/')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td><td class="c"><span class="st '+(P2(r[CI.tiendo])==='DONE'?'dadang">Done':(P2(r[CI.tiendo]).includes('EDIT')?'choedit">'+esc(r[CI.tiendo]):'ytuong">'+esc(r[CI.tiendo]||'—')))+'</span></td><td class="c small">'+esc(r[CI.duyet]||'—')+'</td></tr>').join('')+'</table></div>';
+      const hasDV2=CI.dienvien>=0;
+      h+='<div class="tblwrap"><table><tr><th class="c">Ngày đăng</th><th>Video</th><th>Loại</th>'+(hasDV2?'<th>Diễn viên</th>':'')+'<th class="c">quay/dựng</th><th class="c">Tiến độ hiện tại</th></tr>'
+        +nwk.map(r=>'<tr><td class="c">'+cl(r[CI.air]).split('/').slice(0,2).join('/')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td>'+(hasDV2?'<td class="small">'+esc(cl(r[CI.dienvien])||'—')+'</td>':'')+'<td class="c small">'+(P2(r[CI.quay])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P2(r[CI.dung])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+progBadge(progOf(r,pd2(r[CI.air])))+'</td></tr>').join('')+'</table></div>';
     } else h+=emptyMsg('Lịch content chưa có video nào cho tuần tới — cần lên lịch thêm.');
   }
   const kh=nxAll.filter(o=>cl(o.loai).toUpperCase()==='KEHOACH');
@@ -830,6 +835,26 @@ function renderS2(){
     ? '<div class="bullets">'+tr.map(o=>'<div class="b"><span class="ic">•</span><div><b>'+esc(o.nd)+'</b>'+(o.ghi?' — <span class="small">'+esc(o.ghi)+'</span>':'')+'</div></div>').join('')+'</div>'
     : emptyMsg('Chưa ghi trend (LOAI = TREND).');
   return h;
+}
+/* tiến độ 1 dòng lịch content: sheet team đã BỎ cột «Tiến độ» → tự suy từ Trạng thái + Đã quay/Đã dựng + ngày air
+   (nếu sheet còn cột Tiến độ thì vẫn ưu tiên đọc). d = ngày air/deadline/lịch quay của dòng */
+function progOf(r,d){
+  const U=s=>cl(s).toUpperCase();
+  const t=CI.tiendo>=0?U(r[CI.tiendo]):'';
+  if(t) return t;
+  if(U(r[CI.duyet])==='AIR') return 'DONE';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const q=U(r[CI.quay])==='TRUE', dg=U(r[CI.dung])==='TRUE', tre=d&&d<today;
+  if(dg) return tre?'TRỄ AIR':'CHỜ AIR';
+  if(q)  return tre?'TRỄ EDIT':'ĐANG EDIT';
+  return tre?'TRỄ QUAY':'CHƯA QUAY';
+}
+function progBadge(t){
+  const u=cl(t).toUpperCase();
+  if(u==='DONE') return '<span class="st dadang">Đã air</span>';
+  if(u.includes('TRỄ')) return '<span class="st chuaquay">'+esc(t)+'</span>';
+  if(/EDIT|CHỜ AIR/.test(u)) return '<span class="st choedit">'+esc(t)+'</span>';
+  return '<span class="st ytuong">'+esc(t||'—')+'</span>';
 }
 function contentBlock(a,b,emptyText){
   if(CONTENT_ERR) return emptyMsg('Không đọc được Sheet lịch content — kiểm tra Sheet còn công khai không.');
@@ -847,21 +872,18 @@ function contentBlock(a,b,emptyText){
   });
   if(!rows.length) return emptyMsg(emptyText);
   const cur=rows.filter(r=>inR(dOf(r),a,b));
-  const aired=cur.filter(r=>P(r[CI.tiendo])==='DONE'||P(r[CI.duyet])==='AIR').length;
-  const editing2=cur.filter(r=>P(r[CI.tiendo]).includes('EDIT')).length;
-  const late=cur.filter(r=>P(r[CI.tiendo]).includes('TRỄ')).length;
-  const notyet=cur.filter(r=>P(r[CI.tiendo]).includes('CHƯA')).length;
+  const prog=r=>progOf(r,dOf(r));
+  const aired=cur.filter(r=>prog(r)==='DONE').length;
+  const editing2=cur.filter(r=>/EDIT|CHỜ AIR/.test(prog(r))).length;
+  const late=cur.filter(r=>prog(r).includes('TRỄ')).length;
+  const notyet=cur.filter(r=>prog(r).includes('CHƯA')).length;
   let h='<div class="pipestats"><div class="pipestat"><b>'+cur.length+'</b><span>video kỳ này</span></div>'
     +'<div class="pipestat"><b>'+aired+'</b><span>đã đăng (air)</span></div>'
-    +'<div class="pipestat"><b>'+editing2+'</b><span>đang edit</span></div>'
-    +'<div class="pipestat"><b>'+late+'</b><span>trễ deadline</span></div>'
-    +'<div class="pipestat"><b>'+notyet+'</b><span>chưa bắt đầu</span></div></div>';
+    +'<div class="pipestat"><b>'+editing2+'</b><span>đang edit / chờ air</span></div>'
+    +'<div class="pipestat"><b>'+late+'</b><span>trễ lịch</span></div>'
+    +'<div class="pipestat"><b>'+notyet+'</b><span>chưa quay</span></div></div>';
   h+='<div class="secnote"><span style="background:#F3E4CF;padding:2px 8px;border-radius:6px">nền be = kỳ đang xem ('+ddmm(a)+' – '+ddmm(b)+')</span> · <span style="background:#FFF1BF;padding:2px 8px;border-radius:6px">nền vàng = tuần kế tiếp ('+ddmm(nxA)+' – '+ddmm(nxB)+')</span> · còn lại = các tuần khác trong tháng</div>';
-  const badge=t=>{ const u=P(t);
-    if(u==='DONE') return '<span class="st dadang">Done</span>';
-    if(u.includes('EDIT')) return '<span class="st choedit">'+esc(t)+'</span>';
-    if(u.includes('TRỄ')) return '<span class="st chuaquay">'+esc(t)+'</span>';
-    return '<span class="st ytuong">'+esc(t||'—')+'</span>'; };
+  const badge=progBadge;
   /* cột Chạy ads: ưu tiên giá trị team ghi trong sheet content; chưa có thì trang tự gợi ý theo Loại clip */
   const adsGoiY=loai=>{ const u=cl(loai).toUpperCase();
     if(/HƯỚNG DẪN|EDUCATE|MẸO/.test(u)) return '<span class="tag org">RẤT HỢP</span>';
@@ -869,12 +891,16 @@ function contentBlock(a,b,emptyText){
     if(/BÁN HÀNG|SẢN PHẨM|THƯƠNG MẠI|SERIES/.test(u)) return '<span class="tag org">HỢP</span>';
     if(/GIẢI TRÍ|ĐỜI SỐNG|BRANDING/.test(u)) return '<span class="tag gold">TUỲ — có SP mới chạy</span>';
     return '<span class="small">—</span>'; };
-  h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>Video</th><th>Loại</th><th class="c">quay/dựng</th><th class="c">Tiến độ</th><th class="c">Duyệt</th><th class="c">Chạy ads?</th></tr>'
+  const hasDV=CI.dienvien>=0, hasLink=CI.link>=0;
+  h+='<div class="tblwrap"><table><tr><th class="c">Ngày air</th><th>Video</th><th>Loại</th>'+(hasDV?'<th>Diễn viên</th>':'')+'<th class="c">quay/dựng</th><th class="c">Tiến độ</th><th class="c">Chạy ads?</th>'+(hasLink?'<th class="c">Link</th>':'')+'</tr>'
     +rows.slice().sort((x,y)=>(dOf(x)||mB)-(dOf(y)||mB))
       .map(r=>{ const d=dOf(r); const cls=inR(d,a,b)?' class="hl1"':(inR(d,nxA,nxB)?' class="hl2"':'');
         const userAds=CONTENT_ADS_COL>=0?cl(r[CONTENT_ADS_COL]):'';
-        const adsC='<td class="c">'+(userAds?'<span class="tag ads">'+esc(userAds)+'</span>':adsGoiY(r[CI.loai]))+'</td>';
-        return '<tr'+cls+'><td class="c">'+(cl(r[CI.air])?cl(r[CI.air]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td><td class="c small">'+(P(r[CI.quay])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[CI.dung])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(r[CI.tiendo])+'</td><td class="c small">'+esc(r[CI.duyet]||'—')+'</td>'+adsC+'</tr>'; }).join('')+'</table></div>';
+        const adsC='<td class="c">'+(userAds&&userAds.toUpperCase()!=='FALSE'?'<span class="tag ads">'+esc(userAds)+'</span>':adsGoiY(r[CI.loai]))+'</td>';
+        const lk=hasLink?cl(r[CI.link]):'';
+        const lkC=hasLink?'<td class="c">'+(/^https?:\/\//i.test(lk)?'<a class="vlink" href="'+esc(lk)+'" target="_blank" rel="noopener">▶ Xem</a>':'<span class="small">—</span>')+'</td>':'';
+        const dvC=hasDV?'<td class="small">'+esc(cl(r[CI.dienvien])||'—')+'</td>':'';
+        return '<tr'+cls+'><td class="c">'+(cl(r[CI.air])?cl(r[CI.air]).split('/').slice(0,2).join('/'):'—')+'</td><td class="vidname">'+esc(r[CI.ten])+(cl(r[CI.ma])?' <span class="small">('+esc(r[CI.ma])+')</span>':'')+'</td><td class="small">'+esc(r[CI.loai]||'—')+'</td>'+dvC+'<td class="c small">'+(P(r[CI.quay])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+' / '+(P(r[CI.dung])==='TRUE'?'<span class="tick">✓</span>':'<span class="tick off">–</span>')+'</td><td class="c">'+badge(prog(r))+'</td>'+adsC+lkC+'</tr>'; }).join('')+'</table></div>';
   return h;
 }
 
