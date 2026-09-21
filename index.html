@@ -218,12 +218,12 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text2)}
 
 <script>
 /* ═══════════ CẤU HÌNH ═══════════ */
-const SHEET_ID = '1CHDLJAjR9UaQ5wPjkF9ZBMwGTU2ifuM_GT0LXGUkypM';
+const SHEET_ID = '1zLA3KwmDgIv41mB47fs5B4e6mvHvggfO_DTpwCEfy90';   /* sheet MỚI (mỗi tuần 1 tab) từ 21/09/2026 */
 /* gid 4 tab — cập nhật 08/08/2026 (mỗi lần Nhập→Thay thế bảng tính là Google đổi gid, phải lấy lại) */
-const GIDS = { TONGQUAN:'2091553797', VIDEO:'187640753', DUAN:'794755908', NHANXET:'2137888752' };
+const GIDS = { TONGQUAN:'', VIDEO:'', DUAN:'', NHANXET:'' };   /* 4 tab cũ không còn dùng — toàn bộ số nằm trong tab tuần */
 /* Tab MỤC LỤC: mỗi dòng = 1 tuần (tên tuần | link tab có #gid=). Trang đọc mục lục → tự tìm các tab tuần.
    Tuần mới chỉ cần: tạo tab, dán form, thêm 1 dòng vào MỤC LỤC — KHÔNG sửa code. Để '' nếu chưa có tab này. */
-const MUCLUC_GID = '';
+const MUCLUC_GID = '1321643666';
 /* Lịch content theo ngày — tab LỊCH ĐĂNG file quản lý content */
 const CONTENT_CSV_URL = 'https://docs.google.com/spreadsheets/d/1ASAWCqucmXOIBI-DjgXTdDiONOHEhOF1yG5hMKH0uxs/export?format=csv&gid=1170970805';
 /* PHẢI dùng /export?format=csv — KHÔNG dùng /gviz/tq (nó xoá chữ trong cột lẫn số). */
