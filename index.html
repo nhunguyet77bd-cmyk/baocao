@@ -221,6 +221,9 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--text2)}
 const SHEET_ID = '1CHDLJAjR9UaQ5wPjkF9ZBMwGTU2ifuM_GT0LXGUkypM';
 /* gid 4 tab — cập nhật 08/08/2026 (mỗi lần Nhập→Thay thế bảng tính là Google đổi gid, phải lấy lại) */
 const GIDS = { TONGQUAN:'2091553797', VIDEO:'187640753', DUAN:'794755908', NHANXET:'2137888752' };
+/* Tab MỤC LỤC: mỗi dòng = 1 tuần (tên tuần | link tab có #gid=). Trang đọc mục lục → tự tìm các tab tuần.
+   Tuần mới chỉ cần: tạo tab, dán form, thêm 1 dòng vào MỤC LỤC — KHÔNG sửa code. Để '' nếu chưa có tab này. */
+const MUCLUC_GID = '';
 /* Lịch content theo ngày — tab LỊCH ĐĂNG file quản lý content */
 const CONTENT_CSV_URL = 'https://docs.google.com/spreadsheets/d/1ASAWCqucmXOIBI-DjgXTdDiONOHEhOF1yG5hMKH0uxs/export?format=csv&gid=1170970805';
 /* PHẢI dùng /export?format=csv — KHÔNG dùng /gviz/tq (nó xoá chữ trong cột lẫn số). */
@@ -377,7 +380,10 @@ function parseDuan(rows){
 }
 async function fetchTab(key,tab){
   const gid=GIDS[tab];
-  if(gid===null||gid===undefined||gid===''){ DEMOTABS.push(tab); return parseCSV(DEMO[key]); }
+  if(gid===null||gid===undefined||gid===''){
+    if(MUCLUC_GID) return [];                    /* sheet mới: toàn bộ số nằm trong các tab tuần, không còn 4 tab cũ */
+    DEMOTABS.push(tab); return parseCSV(DEMO[key]);
+  }
   /* thử 3 cách lấy dữ liệu — chỉ dùng số liệu mẫu khi cả 3 đều hỏng */
   const cachs=[
     ()=>fetch(tabUrl(gid)+'&_cb='+Date.now(),{cache:'no-store'}),
@@ -415,15 +421,108 @@ async function loadContent(){
   }catch(e){ CONTENT_ERR=true; }
   if(RA) render();
 }
+/* ═══════════ FORM TUẦN (mỗi tuần 1 tab, kiểu chị Hòa) ═══════════
+   Tab tuần là 1 form cố định, mỗi mục bắt đầu bằng dòng tiêu đề ①…⑨ ở cột A, dòng kế là tên cột, rồi dữ liệu tới khi gặp dòng trống.
+   Hàm này đọc form → trả về {tq,vid,nx,duan,from,to} cùng cấu trúc với 4 tab cũ, nên toàn bộ trang không phải đổi gì. */
+const FORM_ERR=[];             // tab tuần đọc lỗi
+function parseWeekForm(rows, tenTab){
+  const U=s=>cl(s).toUpperCase();
+  const out={tq:[],vid:[],nx:[],duan:[],from:null,to:null};
+  const SEC=[
+    [/^①|GMV THEO NGÀY/,'ngay'], [/^②|SỐ TỔNG/,'tong'], [/^③|VIDEO ĐĂNG/,'vidmoi'], [/^④|VIDEO CŨ/,'vidcu'],
+    [/^⑤|SẢN PHẨM/,'sp'], [/^⑥|NGUỒN TRUY CẬP|TRAFFIC/,'traffic'], [/^⑦|NGƯỜI XEM|NHÂN KHẨU/,'nk'],
+    [/^⑧|NHẬN XÉT/,'nx'], [/^⑨|DỰ ÁN/,'duan'] ];
+  let sec=null, skipHead=false;
+  for(const r of rows){
+    const a=cl(r[0]);
+    if(/^TU[ẦA]N$/i.test(a)&&dmy(cl(r[1]))){ out.from=dmy(cl(r[1])); out.to=dmy(cl(r[2]))||out.from; continue; }
+    /* tiêu đề mục: cột A khớp mẫu VÀ cột B trống (dòng dữ liệu «Sản phẩm | 40 | …» luôn có cột B) */
+    const hit=(!cl(r[1])&&!cl(r[2]))?SEC.find(([re])=>re.test(U(a))):null;
+    if(hit){ sec=hit[1]; skipHead=true; continue; }
+    if(!sec) continue;
+    if(skipHead){ skipHead=false; continue; }              /* bỏ dòng tên cột */
+    if(!a && !cl(r[1])){ sec=null; continue; }             /* dòng trống = hết mục */
+    const d=out.to;
+    switch(sec){
+      case 'ngay': { const dd=dmy(a); if(dd&&cl(r[1])!=='') out.tq.push({d:dd,gmv:num(r[1]),ads:null,chi:null,don:null,xem:null,fol:null,note:cl(r[2])||'',tim:null,bl:null,cs:null}); break; }
+      case 'tong': { out._tong=out._tong||{}; out._tong[U(a)]=cl(r[1]); break; }
+      case 'vidmoi': { if(!cl(r[1])) break;
+        out.vid.push({d,ten:cl(r[1]),dang:dmy(a),loai:cl(r[2]),nguon:cl(r[9])||'ORG',gmv:num(r[10])||0,don:num(r[11])||0,
+          xem:num(r[3]),tim:num(r[4]),bl:num(r[5]),cs:num(r[6]),luu:num(r[7]),dg:cl(r[8]),chiAds:null}); break; }
+      case 'vidcu': { if(!a) break;
+        out.vid.push({d,ten:a,dang:dmy(cl(r[1])),loai:cl(r[4])||'',nguon:cl(r[5])||'ORG',gmv:num(r[2]),don:num(r[3]),
+          xem:null,tim:null,bl:null,cs:null,luu:null,dg:'',chiAds:null}); break; }
+      case 'sp': { if(a) out.nx.push({d,loai:'SANPHAM',nd:a,ghi:'',mon:num(r[1]),gmv:num(r[2])}); break; }
+      case 'traffic': { if(a) out.nx.push({d,loai:'TRAFFIC',nd:a,ghi:'',mon:num(r[1]),gmv:null}); break; }
+      case 'nk': { if(a) out.nx.push({d,loai:'NHANKHAU',nd:a,ghi:'',mon:num(r[1]),gmv:null}); break; }
+      case 'nx': { if(a&&cl(r[1])) out.nx.push({d,loai:U(a),nd:cl(r[1]),ghi:cl(r[2]),mon:null,gmv:null}); break; }
+      case 'duan': { const duAn=a, muc=U(cl(r[1])); if(!duAn||!muc) break;
+        if(cl(r[2])) out.duan.push({d,duAn,team:'GENZ',muc,nd:cl(r[2])});
+        if(cl(r[3])) out.duan.push({d,duAn,team:'THANHBINH',muc,nd:cl(r[3])});
+        if(cl(r[4])) out.duan.push({d,duAn,team:'',muc,nd:cl(r[4])}); break; }
+    }
+  }
+  if(!out.to){ out.to=out.tq.length?new Date(Math.max(...out.tq.map(o=>o.d.getTime()))):null; }
+  /* mục ② → gộp vào dòng ngày cuối tuần (quy ước cũ của tab TONGQUAN) */
+  if(out.to&&out._tong){
+    const T=out._tong, g=re=>{ const k=Object.keys(T).find(k=>re.test(k)); return k!==undefined?T[k]:''; };
+    let last=out.tq.find(o=>o.d.getTime()===out.to.getTime());
+    if(!last){ last={d:out.to,gmv:null,ads:null,chi:null,don:null,xem:null,fol:null,note:'',tim:null,bl:null,cs:null}; out.tq.push(last); }
+    const n=v=>cl(v)===''?null:num(v);
+    last.don=n(g(/ĐƠN/)); last.xem=n(g(/LƯỢT XEM TOÀN|LƯỢT XEM KÊNH|^LƯỢT XEM$/)); last.tim=n(g(/THÍCH|^TIM/)); last.bl=n(g(/BÌNH LUẬN/));
+    last.cs=n(g(/CHIA SẺ/)); last.fol=n(g(/FOLLOWER RÒNG|TĂNG RÒNG/)); last.chi=n(g(/CHI PHÍ/)); last.ads=n(g(/GMV.*QUẢNG CÁO|GMV ADS/));
+    const note=[g(/GHI CHÚ/)]; const nx1=g(/NGƯỜI XEM MỚI/), nx0=g(/^NGƯỜI XEM$|TỔNG NGƯỜI XEM/);
+    if(nx0) note.push('tổng người xem '+nx0); if(nx1) note.push('người xem mới '+nx1);
+    last.note=note.filter(Boolean).join(' · ');
+    const tf=g(/TỔNG FOLLOWER/); if(cl(tf)!=='') out.nx.push({d:out.to,loai:'FOLLOWER',nd:'Tổng follower toàn kênh',ghi:'',mon:null,gmv:num(tf)});
+  }
+  /* d của video/nx/duan = ngày cuối tuần */
+  [...out.vid,...out.nx,...out.duan].forEach(o=>{ if(!o.d) o.d=out.to; });
+  return out;
+}
+async function loadWeekForms(){
+  const res=[];
+  if(!MUCLUC_GID) return res;
+  let ml;
+  try{
+    const r=await fetch(tabUrl(MUCLUC_GID)+'&_cb='+Date.now(),{cache:'no-store'});
+    const t=await r.text(); if(!r.ok||t.trim().startsWith('<')) throw new Error('MỤC LỤC không đọc được');
+    ml=parseCSV(t);
+  }catch(e){ FORM_ERR.push('MỤC LỤC: '+(e.message||e)); return res; }
+  const jobs=[];
+  for(const r of ml){
+    const ten=cl(r[0]); const m=(cl(r[1])+' '+cl(r[2])).match(/gid=(\d+)|^\s*(\d{6,})\s*$/);
+    const gid=m?(m[1]||m[2]):null;
+    if(!ten||!gid||/^tên tuần|^mục lục/i.test(ten)) continue;
+    jobs.push((async()=>{
+      try{
+        const rr=await fetch(tabUrl(gid)+'&_cb='+Date.now(),{cache:'no-store'});
+        const tt=await rr.text(); if(!rr.ok||tt.trim().startsWith('<')) throw new Error('không đọc được');
+        const f=parseWeekForm(parseCSV(tt),ten); f.ten=ten; res.push(f);
+      }catch(e){ FORM_ERR.push(ten+': '+(e.message||e)); }
+    })());
+  }
+  await Promise.all(jobs);
+  return res;
+}
 async function load(){
-  const [tq,vid,duan,nx] = await Promise.all([
-    fetchTab('tq','TONGQUAN'), fetchTab('vid','VIDEO'), fetchTab('duan','DUAN'), fetchTab('nx','NHANXET')
+  const [tq,vid,duan,nx,forms] = await Promise.all([
+    fetchTab('tq','TONGQUAN'), fetchTab('vid','VIDEO'), fetchTab('duan','DUAN'), fetchTab('nx','NHANXET'), loadWeekForms()
   ]);
   loadContent();
   const fix=r=>{ if(r.dang!==undefined) r.dang=dmy(r.dang); return r; };
   DB.tq=rowsToObjs(tq,MAPS.tq,['gmv','ads','chi','don','xem','fol']);
   DB.vid=rowsToObjs(vid,MAPS.vid,['ten']).map(fix);
   DB.duan=parseDuan(duan); DB.nx=rowsToObjs(nx,MAPS.nx,['nd']);
+  /* gộp các tab tuần (form) vào — tuần nào có form thì form ĐÈ dữ liệu cũ cùng khoảng ngày */
+  for(const f of forms){
+    if(!f.from||!f.to) continue;
+    const inW=o=>o.d&&o.d>=f.from&&o.d<=f.to;
+    DB.tq=DB.tq.filter(o=>!inW(o)).concat(f.tq);
+    DB.vid=DB.vid.filter(o=>!inW(o)).concat(f.vid);
+    DB.nx=DB.nx.filter(o=>!inW(o)).concat(f.nx);
+    DB.duan=DB.duan.filter(o=>!inW(o)).concat(f.duan);
+  }
   const all=[...DB.tq,...DB.vid,...DB.duan,...DB.nx].map(o=>o.d).filter(Boolean);
   const maxD = all.length ? new Date(Math.max(...all.map(d=>d.getTime()))) : new Date(2026,6,27);
   /* mặc định: tuần (T2→CN) chứa ngày mới nhất có dữ liệu */
@@ -611,6 +710,8 @@ function emptyMsg(t){ return '<div class="empty">'+t+'</div>'; }
 
 function banner(){
   let h='';
+  if(FORM_ERR.length)
+    h+='<div class="banner">Tab tuần không đọc được: <b>'+esc(FORM_ERR.join(' · '))+'</b> — kiểm lại link trong MỤC LỤC (phải có #gid=) và tab đó đã công khai.</div>';
   if(DEMOTABS.length)
     h+='<div class="banner">Tab <b>'+DEMOTABS.join(', ')+'</b> đang dùng <b>SỐ LIỆU MẪU</b> <span class="small">(lý do: '+esc(Object.values(LOI_TAI)[0]||'không rõ')+' — thử tải lại trang)</span> — sau khi bạn nạp file <b>BAO-CAO-TIKTOK-LOHO.xlsx</b> lên Google Sheet, nhắn Claude liên kết là số thật tự chạy.</div>';
   return h;
