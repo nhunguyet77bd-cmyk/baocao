@@ -750,6 +750,28 @@ function pctBadge(cur,prev){
             :'<span class="badge dn">▼ '+p.toLocaleString('vi-VN',{maximumFractionDigits:1})+'% so kỳ trước</span>';
 }
 function kpi(zh,vi,val,badge){ return '<div class="kpi"><div class="lb"><span class="zh">'+zh+'</span>'+vi+'</div><div class="val">'+val+'</div>'+badge+'</div>'; }
+/* ─── SỐ GỐC CẢ THÁNG ───
+   Cộng dồn số tổng của từng tuần thì tuần nào vắt qua 2 tháng cũng bị tính trọn,
+   nên số tháng lệch với số TikTok tự báo. Nhập dòng LOAI = THANG vào mục ⑧ là trang
+   lấy thẳng số đó cho các ô KPI. Cú pháp: «MÃ | giá trị | ghi chú %».
+   MÃ: GMV · DON · XEM · TIM · BL · CS · FOL · TONGFOL */
+function monthOverride(){
+  const o={};
+  if(!isMonthMode()) return o;          /* xem theo TUẦN thì vẫn dùng số tuần như cũ */
+  rowsIn(DB.nx).filter(r=>cl(r.loai).toUpperCase()==='THANG').forEach(r=>{
+    const p=cl(r.nd).split('|').map(cl);
+    if(p.length<2) return;
+    o[p[0].toUpperCase()]={v:num(p[1]), t:p[2]||''};
+  });
+  return o;
+}
+const moVal=(o,k,fb)=>o[k]!==undefined?o[k].v:fb;
+function moBadge(o,k,fb){
+  if(o[k]===undefined) return fb;
+  const t=o[k].t||''; if(!t) return '<span class="badge fl">số gốc cả tháng</span>';
+  const cls=/giảm|▼|-/.test(t)?'dn':(/tăng|▲/.test(t)?'up':'fl');
+  return '<span class="badge '+cls+'">'+esc(t)+' · số gốc</span>';
+}
 function secTitle(zh,vi,star,note){ return '<div class="sec"><h2><span class="zh">'+zh+'</span>'+vi+'</h2>'+(star?'<span class="star">sếp nhấn mạnh</span>':'')+'</div>'+(note?'<div class="secnote">'+note+'</div>':''); }
 function emptyMsg(t){ return '<div class="empty">'+t+'</div>'; }
 
@@ -790,16 +812,18 @@ function renderS1(){
   const flTongTop=flTopRows.length?flTopRows[0].mon:null;
   let h=secTitle('本期總覽','Tổng Quan',1,'GMV video + nguồn ads/organic · mọi ô % đang so với '+prevLabel());
   h+=warnThieuNgay();
+  const MO=monthOverride();
+  if(Object.keys(MO).length) h+='<div class="secnote"><b>Các ô bên dưới đang dùng SỐ GỐC cả tháng</b> — lấy thẳng từ Seller Center / TikTok Studio (dòng LOAI = THANG trong Sheet), không phải cộng dồn từng tuần, nên khớp đúng với số bạn chụp trên TikTok.</div>';
   h+='<div class="kpis">'
-    +kpi('影片GMV','GMV từ video',fmtMoney(gmv),pctBadge(gmv,tqP.length?gmvP:null))
-    +kpi('訂單','Đơn hàng từ video',fmtN(sum(tq,'don')||null),pctBadge(sum(tq,'don'),tqP.length?sum(tqP,'don'):null))
-    +kpi('觀看','Lượt xem toàn kênh',fmtN(sum(tq,'xem')||null),pctBadge(sum(tq,'xem'),tqP.length?sum(tqP,'xem'):null))
-    +kpi('愛心','Lượt thích '+kyWord(),fmtN(sum(tq,'tim')||null),pctBadge(sum(tq,'tim'),tqP.length?sum(tqP,'tim'):null))
-    +kpi('留言','Bình luận '+kyWord(),fmtN(sum(tq,'bl')||null),pctBadge(sum(tq,'bl'),tqP.length?sum(tqP,'bl'):null))
-    +kpi('分享','Chia sẻ '+kyWord(),fmtN(sum(tq,'cs')||null),pctBadge(sum(tq,'cs'),tqP.length?sum(tqP,'cs'):null))
+    +kpi('影片GMV','GMV từ video',fmtMoney(moVal(MO,'GMV',gmv)),moBadge(MO,'GMV',pctBadge(gmv,tqP.length?gmvP:null)))
+    +kpi('訂單','Đơn hàng từ video',fmtN(moVal(MO,'DON',sum(tq,'don'))||null),moBadge(MO,'DON',pctBadge(sum(tq,'don'),tqP.length?sum(tqP,'don'):null)))
+    +kpi('觀看','Lượt xem toàn kênh',fmtN(moVal(MO,'XEM',sum(tq,'xem'))||null),moBadge(MO,'XEM',pctBadge(sum(tq,'xem'),tqP.length?sum(tqP,'xem'):null)))
+    +kpi('愛心','Lượt thích '+kyWord(),fmtN(moVal(MO,'TIM',sum(tq,'tim'))||null),moBadge(MO,'TIM',pctBadge(sum(tq,'tim'),tqP.length?sum(tqP,'tim'):null)))
+    +kpi('留言','Bình luận '+kyWord(),fmtN(moVal(MO,'BL',sum(tq,'bl'))||null),moBadge(MO,'BL',pctBadge(sum(tq,'bl'),tqP.length?sum(tqP,'bl'):null)))
+    +kpi('分享','Chia sẻ '+kyWord(),fmtN(moVal(MO,'CS',sum(tq,'cs'))||null),moBadge(MO,'CS',pctBadge(sum(tq,'cs'),tqP.length?sum(tqP,'cs'):null)))
     +kpi('影片數','Video đăng '+kyWord(),fmtN(newV.length),pctBadge(newV.length,vidP.length?newVP.length:null))
-    +kpi('粉絲','Follower tăng ròng',(sum(tq,'fol')>0?'+':'')+fmtN(sum(tq,'fol')||null),pctBadge(sum(tq,'fol'),tqP.length?sum(tqP,'fol'):null))
-    +kpi('總粉絲','Tổng follower',flTongTop!=null?fmtN(flTongTop):'—','<span class="badge fl">toàn kênh tính tới cuối kỳ</span>')
+    +kpi('粉絲','Follower tăng ròng',(moVal(MO,'FOL',sum(tq,'fol'))>0?'+':'')+fmtN(moVal(MO,'FOL',sum(tq,'fol'))||null),moBadge(MO,'FOL',pctBadge(sum(tq,'fol'),tqP.length?sum(tqP,'fol'):null)))
+    +kpi('總粉絲','Tổng follower',moVal(MO,'TONGFOL',flTongTop)!=null?fmtN(moVal(MO,'TONGFOL',flTongTop)):'—','<span class="badge fl">toàn kênh tính tới cuối kỳ</span>')
     +'</div>';
   /* 🎯 mục tiêu cấp sàn — lấy dòng MUCTIEU mới nhất (không giới hạn kỳ) */
   const mts=DB.nx.filter(o=>cl(o.loai).toUpperCase()==='MUCTIEU'&&o.d<=RB).sort((a,b)=>b.d-a.d);
