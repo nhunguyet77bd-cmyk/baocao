@@ -1015,10 +1015,11 @@ function progOf(r,d){
   if(t) return t;
   if(U(r[CI.duyet])==='AIR') return 'DONE';
   const today=new Date(); today.setHours(0,0,0,0);
-  const q=U(r[CI.quay])==='TRUE', dg=U(r[CI.dung])==='TRUE', tre=d&&d<today;
-  if(dg) return tre?'TRỄ AIR':'CHỜ AIR';
-  if(q)  return tre?'TRỄ EDIT':'ĐANG EDIT';
-  return tre?'TRỄ QUAY':'CHƯA QUAY';
+  /* team cập nhật lịch liên tục nên KHÔNG gắn nhãn trễ deadline nữa — chỉ báo đang ở bước nào */
+  const q=U(r[CI.quay])==='TRUE', dg=U(r[CI.dung])==='TRUE';
+  if(dg) return 'CHỜ AIR';
+  if(q)  return 'ĐANG EDIT';
+  return 'CHƯA QUAY';
 }
 function progBadge(t){
   const u=cl(t).toUpperCase();
@@ -1046,12 +1047,10 @@ function contentBlock(a,b,emptyText){
   const prog=r=>progOf(r,dOf(r));
   const aired=cur.filter(r=>prog(r)==='DONE').length;
   const editing2=cur.filter(r=>/EDIT|CHỜ AIR/.test(prog(r))).length;
-  const late=cur.filter(r=>prog(r).includes('TRỄ')).length;
-  const notyet=cur.filter(r=>prog(r).includes('CHƯA')).length;
+  const notyet=cur.filter(r=>prog(r)==='CHƯA QUAY').length;
   let h='<div class="pipestats"><div class="pipestat"><b>'+cur.length+'</b><span>video kỳ này</span></div>'
     +'<div class="pipestat"><b>'+aired+'</b><span>đã đăng (air)</span></div>'
     +'<div class="pipestat"><b>'+editing2+'</b><span>đang edit / chờ air</span></div>'
-    +'<div class="pipestat"><b>'+late+'</b><span>trễ lịch</span></div>'
     +'<div class="pipestat"><b>'+notyet+'</b><span>chưa quay</span></div></div>';
   h+='<div class="secnote"><span style="background:#F3E4CF;padding:2px 8px;border-radius:6px">nền be = kỳ đang xem ('+ddmm(a)+' – '+ddmm(b)+')</span> · <span style="background:#FFF1BF;padding:2px 8px;border-radius:6px">nền vàng = tuần kế tiếp ('+ddmm(nxA)+' – '+ddmm(nxB)+')</span> · còn lại = các tuần khác trong tháng</div>';
   const badge=progBadge;
